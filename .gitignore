@@ -1,3 +1,14 @@
 # AI Agent Task
 .docs
 .doc
+
+# Xcode
+
+
+# Android
+app/build/
+.gradle
+.idea
+.idea/
+
+
