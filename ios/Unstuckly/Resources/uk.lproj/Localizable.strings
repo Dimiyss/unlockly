@@ -1,0 +1,27 @@
+/* Localizable.strings - UK */
+
+"app_name" = "Unstuckly";
+"tagline" = "Заробляй екранний час";
+"preferences" = "Налаштування";
+"appearance" = "Тема оформлення";
+"theme_system" = "Системна за замовчуванням";
+"theme_light" = "Світла тема";
+"theme_dark" = "Темна тема";
+"language" = "Мова";
+"social_wallet" = "Соціальний гаманець";
+"available_balance" = "Доступний баланс";
+"minutes_unit" = "хв";
+"daily_cap" = "Денний ліміт";
+"resets_midnight" = "Скидається опівночі";
+"today_activity" = "Сьогоднішня активність";
+"productive_earned" = "Зароблено навчанням";
+"social_consumed" = "Витрачено у соцмережах";
+"quick_actions" = "Швидкі дії";
+"start_study" = "Почати навчання";
+"open_social" = "Відкрити соцмережу";
+"active_rule" = "Активне правило";
+"no_rule" = "Немає налаштованого правила";
+"exchange_rate" = "Курс обміну";
+"emergency_override" = "Екстрене розблокування";
+"close" = "Закрити";
+"pro_title" = "Unstuckly PRO";

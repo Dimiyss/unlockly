@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Unlockly"
+rootProject.name = "Unstuckly"
 include(":app")

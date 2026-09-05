@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Unstuckly</string>
+    <string name="accessibility_service_description">Unstuckly utiliza el Servicio de Accesibilidad para registrar el tiempo de estudio productivo y aplicar límites a las redes sociales.</string>
+    <string name="tagline">Gana tiempo de pantalla</string>
+
+    <!-- Theme & Preferences -->
+    <string name="preferences_title">Preferencias</string>
+    <string name="appearance_title">Apariencia</string>
+    <string name="theme_system">Predeterminado del sistema</string>
+    <string name="theme_light">Tema claro</string>
+    <string name="theme_dark">Tema oscuro</string>
+    <string name="language_title">Idioma</string>
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch (DE)</string>
+    <string name="language_uk">Українська (UA)</string>
+    <string name="language_es">Español (ESP)</string>
+    <string name="language_pt">Português (POR)</string>
+    <string name="close">Cerrar</string>
+
+    <!-- Home Screen -->
+    <string name="social_wallet">Billetera Social</string>
+    <string name="available_balance">Saldo disponible</string>
+    <string name="minutes_unit">min</string>
+    <string name="daily_cap">Límite diario</string>
+    <string name="expires_at_midnight">Se reinicia a medianoche</string>
+    <string name="today_activity">Actividad de hoy</string>
+    <string name="productive_earned">Productivo ganado</string>
+    <string name="social_consumed">Social consumido</string>
+    <string name="quick_actions">Acciones rápidas</string>
+    <string name="start_study">Comenzar a estudiar</string>
+    <string name="open_social">Abrir app social</string>
+    <string name="active_rules">Regla activa</string>
+    <string name="no_active_rules">Sin regla configurada</string>
+    <string name="exchange_rate">Tasa de cambio</string>
+    <string name="emergency_override">Desbloqueo de emergencia</string>
+    <string name="emergency_desc">Ingresa tu frase de contraseña (mínimo 35 caracteres) para desbloquear aplicaciones sin fichas.</string>
+    <string name="enter_passphrase">Ingresa la frase…</string>
+    <string name="submit_passphrase">Desbloquear acceso</string>
+    <string name="passphrase_too_short">La frase debe contener al menos 35 caracteres</string>
+    <string name="passphrase_invalid">Frase de contraseña incorrecta</string>
+    <string name="emergency_success">Acceso de emergencia concedido por 15 minutos</string>
+
+    <!-- Internal Home Screen Blocks (Spanish) -->
+    <string name="live_status_idle">Ninguna app productiva activa</string>
+    <string name="live_status_active">Ganando tiempo activamente en %1$s</string>
+    <string name="live_status_paused">En app de estudio (en pausa - interactúa para sumar)</string>
+    <string name="live_status_unfrozen">❄️ Descongelación activa (reglas suspendidas)</string>
+    <string name="live_status_boost_earning">🔥 Ganando con %1$sx Impulso en %2$s</string>
+    <string name="live_status_boost_idle">🔥 Impulso %1$sx activo (estudia para duplicar)</string>
+
+    <string name="wallet_balance_title">Saldo de Billetera Social</string>
+    <string name="wallet_status_empty">Billetera vacía - estudia para desbloquear</string>
+    <string name="wallet_status_unlocked">Apps sociales desbloqueadas</string>
+    <string name="wallet_status_unfrozen">❄️ Pase activo — apps desbloqueadas</string>
+
+    <string name="initial_study_target_title">Meta de Estudio Inicial</string>
+    <string name="initial_study_target_desc">Requisito mínimo antes de desbloquear redes sociales</string>
+    <string name="initial_study_target_met">Meta cumplida • %1$s estudiado hoy</string>
+    <string name="target_unlocked_badge">✅ Desbloqueado</string>
+    <string name="target_locked_badge">🔒 Bloqueado</string>
+    <string name="target_required">%1$s / %2$sm requeridos</string>
+    <string name="target_reward_allowance">Recompensa: +%1$sm de saldo</string>
+    <string name="target_reward_credited">+%1$sm recompensa acreditada</string>
+
+    <string name="metric_studied">Estudiado</string>
+    <string name="metric_earned">Ganado</string>
+    <string name="metric_spent">Usado</string>
+
+    <string name="store_promo_title">Tienda y Mejoras</string>
+    <string name="store_promo_desc">2.0x Mega Impulsos, Pases y PRO</string>
+    <string name="btn_buy">Comprar</string>
+
+    <string name="active_rules_title">Regla Activa y Límites</string>
+    <string name="rule_exchange_rate">Tasa de cambio</string>
+    <string name="rule_daily_cap">Límite diario</string>
+    <string name="rule_productive_apps">Apps productivas</string>
+    <string name="rule_blocked_apps">Apps bloqueadas</string>
+    <string name="rule_apps_configured">%1$d apps configuradas</string>
+    <string name="rule_apps_shielded">%1$d apps bloqueadas</string>
+    <string name="rule_rate_format">%1$dm estudio ➔ %2$dm social</string>
+    <string name="rule_cap_format">%1$d minutos máx / día</string>
+
+    <string name="emergency_unlock_title">Desbloqueo de Emergencia</string>
+    <string name="emergency_unlock_subtitle">Superar bloqueo con frase de 35+ caracteres (1x / día)</string>
+    <string name="emergency_unlock_used">Usado hoy (se reinicia a medianoche)</string>
+
+    <!-- Rule Editor -->
+    <string name="rule_editor_title">Editar regla</string>
+    <string name="productive_apps">Apps productivas (Ganas)</string>
+    <string name="distracting_apps">Apps sociales (Bloqueadas)</string>
+    <string name="ratio_label">1 min estudio = %1$s min social</string>
+    <string name="save_rule">Guardar cambios</string>
+    <string name="rule_saved">Regla guardada con éxito</string>
+    <string name="emergency_passphrase_title">Frase de emergencia (mín. 35 caract.)</string>
+    <string name="passphrase_helper">Escribir una frase larga genera fricción consciente antes de desbloquear.</string>
+
+    <!-- Health Diagnostics -->
+    <string name="health_title">Estado del sistema</string>
+    <string name="diagnostics_title">Diagnóstico del sistema</string>
+    <string name="diagnostics_subtitle">Asegúrate de que todos los permisos y servicios en segundo plano estén concedidos.</string>
+    <string name="usage_access_title">Acceso de uso</string>
+    <string name="usage_access_desc">Detecta cuándo se abren apps productivas o distractoras.</string>
+    <string name="accessibility_title">Servicio de accesibilidad</string>
+    <string name="accessibility_desc">Registra interacción táctil en pantalla y cambio de ventanas.</string>
+    <string name="overlay_title">Superposición sobre otras apps</string>
+    <string name="overlay_desc">Muestra el bloqueo en pantalla completa cuando se agota el saldo.</string>
+    <string name="battery_title">Optimización de batería</string>
+    <string name="battery_desc">Evita que Android cierre el servicio en segundo plano.</string>
+    <string name="recheck_health">Volver a comprobar</string>
+    <string name="grant_permission">Conceder</string>
+    <string name="granted">Concedido</string>
+
+    <!-- Store Screen -->
+    <string name="store_title">Unstuckly PRO</string>
+    <string name="pro_member">¡Eres miembro PRO!</string>
+    <string name="unlock_pro">Mejorar a PRO</string>
+    <string name="restore_purchases">Restaurar compras</string>
+    <string name="monthly_plan">Mensual</string>
+    <string name="annual_plan">Anual (Ahorra 40%)</string>
+    <string name="lifetime_plan">Acceso de por vida</string>
+
+    <!-- Blocker Overlay -->
+    <string name="blocker_title">¡Tiempo terminado!</string>
+    <string name="blocker_subtitle">Tu saldo social está vacío. Gana tiempo estudiando o ingresa tu frase de 35+ caracteres en Unstuckly.</string>
+    <string name="open_unstuckly">Abrir Unstuckly</string>
+    <string name="blocker_study_target_required">Meta de estudio requerida</string>
+    <string name="blocker_time_limit_reached">Límite de tiempo alcanzado</string>
+    <string name="blocker_initial_target_desc">Debes completar tu sesión inicial de estudio de %1$sm hoy antes de acceder a apps bloqueadas.</string>
+    <string name="blocker_progress_format">Progreso: %1$d / %2$d min (%3$d%%)</string>
+    <string name="blocker_wallet_empty_desc">Tu saldo social está vacío. Dedica tiempo productivo en apps de estudio para ganar más tiempo, o usa tu frase de emergencia si es urgente.</string>
+    <string name="blocker_earn_time_button">Gana tiempo en Unstuckly</string>
+    <string name="blocker_emergency_unlock_btn">Desbloqueo de emergencia (Frase)</string>
+    <string name="blocker_cancel_emergency_btn">Cancelar desbloqueo de emergencia</string>
+    <string name="blocker_emergency_prompt">Ingresa tu frase de emergencia de 35+ caracteres:</string>
+    <string name="blocker_emergency_placeholder">Escribe la frase de emergencia...</string>
+    <string name="blocker_length_format">Longitud: %1$d / %2$d</string>
+    <string name="blocker_confirm_emergency_btn">Confirmar desbloqueo</string>
+    <string name="blocker_incorrect_passphrase">Frase de emergencia incorrecta. Inténtalo de nuevo.</string>
+    <string name="blocker_invalid_passphrase">Frase de emergencia no válida.</string>
+    <string name="blocker_emergency_granted_toast">Acceso de emergencia concedido (15 min)</string>
+
+    <!-- Health / Permissions Screen -->
+    <string name="permission_health_title">Estado de permisos</string>
+    <string name="system_diagnostics_title">Diagnóstico del sistema</string>
+    <string name="system_diagnostics_desc">Asegúrate de que todos los servicios y permisos en segundo plano estén concedidos para un bloqueo confiable.</string>
+    <string name="perm_usage_access_title">Acceso de uso</string>
+    <string name="perm_usage_access_desc">Detecta cuándo se abren aplicaciones productivas o de distracción.</string>
+    <string name="perm_accessibility_title">Servicio de accesibilidad</string>
+    <string name="perm_accessibility_desc">Registra toques activos en pantalla y cambios de ventana.</string>
+    <string name="perm_overlay_title">Mostrar sobre otras apps</string>
+    <string name="perm_overlay_desc">Muestra el bloqueo en pantalla completa cuando se agota el saldo social.</string>
+    <string name="perm_battery_title">Desactivar optimización de batería</string>
+    <string name="perm_battery_desc">Evita que el sistema Android cierre el servicio en segundo plano.</string>
+    <string name="btn_grant">Permitir</string>
+    <string name="btn_granted">Permitido</string>
+    <string name="btn_recheck_health">Comprobar estado del sistema</string>
+</resources>

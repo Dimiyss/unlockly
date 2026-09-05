@@ -1,0 +1,27 @@
+/* Localizable.strings - EN */
+
+"app_name" = "Unstuckly";
+"tagline" = "Earn Social Time";
+"preferences" = "Preferences";
+"appearance" = "Appearance";
+"theme_system" = "System Default";
+"theme_light" = "Light Theme";
+"theme_dark" = "Dark Theme";
+"language" = "Language";
+"social_wallet" = "Social Wallet";
+"available_balance" = "Available Balance";
+"minutes_unit" = "min";
+"daily_cap" = "Daily Cap";
+"resets_midnight" = "Resets at midnight";
+"today_activity" = "Today's Activity";
+"productive_earned" = "Productive Earned";
+"social_consumed" = "Social Consumed";
+"quick_actions" = "Quick Actions";
+"start_study" = "Start Studying";
+"open_social" = "Open Social App";
+"active_rule" = "Active Rule";
+"no_rule" = "No active rule configured";
+"exchange_rate" = "Exchange Rate";
+"emergency_override" = "Emergency Override";
+"close" = "Close";
+"pro_title" = "Unstuckly PRO";

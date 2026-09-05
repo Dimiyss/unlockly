@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.antigravity.unlockly"
+    namespace = "com.arhiplabs.unstuckly"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.antigravity.unlockly"
+        applicationId = "com.arhiplabs.unstuckly"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

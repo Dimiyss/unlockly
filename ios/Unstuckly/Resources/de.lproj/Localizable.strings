@@ -1,0 +1,27 @@
+/* Localizable.strings - DE */
+
+"app_name" = "Unstuckly";
+"tagline" = "Verdiene soziale Bildschirmzeit";
+"preferences" = "Einstellungen";
+"appearance" = "Erscheinungsbild";
+"theme_system" = "Systemstandard";
+"theme_light" = "Helles Design";
+"theme_dark" = "Dunkles Design";
+"language" = "Sprache";
+"social_wallet" = "Social Wallet";
+"available_balance" = "Verfügbares Guthaben";
+"minutes_unit" = "Min.";
+"daily_cap" = "Tageslimit";
+"resets_midnight" = "Wird um Mitternacht zurückgesetzt";
+"today_activity" = "Heutige Aktivität";
+"productive_earned" = "Produktiv verdient";
+"social_consumed" = "Social verbraucht";
+"quick_actions" = "Schnellaktionen";
+"start_study" = "Lernen starten";
+"open_social" = "Social App öffnen";
+"active_rule" = "Aktive Regel";
+"no_rule" = "Keine aktive Regel konfiguriert";
+"exchange_rate" = "Wechselkurs";
+"emergency_override" = "Notfall-Freischaltung";
+"close" = "Schließen";
+"pro_title" = "Unstuckly PRO";

@@ -1,0 +1,27 @@
+/* Localizable.strings - ES */
+
+"app_name" = "Unstuckly";
+"tagline" = "Gana tiempo de pantalla";
+"preferences" = "Preferencias";
+"appearance" = "Apariencia";
+"theme_system" = "Predeterminado del sistema";
+"theme_light" = "Tema claro";
+"theme_dark" = "Tema oscuro";
+"language" = "Idioma";
+"social_wallet" = "Billetera Social";
+"available_balance" = "Saldo disponible";
+"minutes_unit" = "min";
+"daily_cap" = "Límite diario";
+"resets_midnight" = "Se reinicia a medianoche";
+"today_activity" = "Actividad de hoy";
+"productive_earned" = "Productivo ganado";
+"social_consumed" = "Social consumido";
+"quick_actions" = "Acciones rápidas";
+"start_study" = "Comenzar a estudiar";
+"open_social" = "Abrir app social";
+"active_rule" = "Regla activa";
+"no_rule" = "Sin regla configurada";
+"exchange_rate" = "Tasa de cambio";
+"emergency_override" = "Desbloqueo de emergencia";
+"close" = "Cerrar";
+"pro_title" = "Unstuckly PRO";
