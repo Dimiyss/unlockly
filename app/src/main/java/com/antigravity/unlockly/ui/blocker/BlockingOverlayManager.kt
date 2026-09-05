@@ -43,6 +43,7 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.antigravity.unlockly.UnlocklyApplication
+import com.antigravity.unlockly.data.model.Rule
 import com.antigravity.unlockly.ui.theme.UnlocklyTheme
 import kotlinx.coroutines.launch
 
@@ -165,6 +166,17 @@ fun OverlayContent(
     val scope = rememberCoroutineScope()
 
     val app = remember { UnlocklyApplication.instance }
+    val walletState by app.walletManager.walletFlow.collectAsState(initial = null)
+    var primaryRule by remember { mutableStateOf<Rule?>(null) }
+
+    LaunchedEffect(Unit) {
+        primaryRule = app.ruleRepository.getPrimaryActiveRule()
+    }
+
+    val targetMinutes = primaryRule?.productiveMinutesTarget ?: 30
+    val targetSeconds = targetMinutes * 60L
+    val studiedSeconds = walletState?.productiveStudySecondsToday ?: 0L
+    val isInitialTargetMet = studiedSeconds >= targetSeconds
 
     Box(
         modifier = Modifier
@@ -202,7 +214,7 @@ fun OverlayContent(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 Text(
-                    text = "Time Limit Reached",
+                    text = if (!isInitialTargetMet) "Study Target Required" else "Time Limit Reached",
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -212,7 +224,11 @@ fun OverlayContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Your social wallet is empty. Spend productive time in study apps to earn access, or use your emergency passphrase if urgently needed.",
+                    text = if (!isInitialTargetMet) {
+                        "You must complete your initial ${targetMinutes}m study session today before accessing blocked apps.\n\nProgress: ${studiedSeconds / 60} / ${targetMinutes} min (${(studiedSeconds * 100 / maxOf(1, targetSeconds)).toInt()}%)"
+                    } else {
+                        "Your social wallet is empty. Spend productive time in study apps to earn more access time, or use your emergency passphrase if urgently needed."
+                    },
                     style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF94A3B8)),
                     textAlign = TextAlign.Center
                 )
@@ -325,8 +341,9 @@ fun OverlayContent(
                         Button(
                             onClick = {
                                 val trimmed = emergencyInput.trim()
-                                if (trimmed.length < MIN_PASSWORD_LENGTH) {
-                                    errorMessage = "Passphrase must be at least $MIN_PASSWORD_LENGTH characters."
+                                val validation = com.antigravity.unlockly.domain.RuleEngine.validateEmergencyPassphrase(trimmed)
+                                if (!validation.isValid) {
+                                    errorMessage = validation.error ?: "Invalid emergency passphrase."
                                     return@Button
                                 }
                                 scope.launch {
@@ -335,7 +352,7 @@ fun OverlayContent(
                                     val isMatch = if (!storedPass.isNullOrBlank()) {
                                         storedPass.trim() == trimmed
                                     } else {
-                                        // Fallback if rule had no pass configured: accept >= 35 chars
+                                        // Fallback if rule had no pass configured: accept valid 35+ chars passphrase
                                         true
                                     }
 
@@ -348,7 +365,7 @@ fun OverlayContent(
                                     }
                                 }
                             },
-                            enabled = emergencyInput.trim().length >= MIN_PASSWORD_LENGTH,
+                            enabled = com.antigravity.unlockly.domain.RuleEngine.isEmergencyPassphraseValid(emergencyInput),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth()

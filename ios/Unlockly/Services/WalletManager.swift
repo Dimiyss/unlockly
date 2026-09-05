@@ -44,6 +44,32 @@ public class WalletManager: ObservableObject {
         }
     }
 
+    public func addProductiveStudySeconds(_ seconds: Int) {
+        checkAndPerformDayResetIfNeeded()
+        guard seconds > 0 else { return }
+        var updated = wallet
+        let prevStudy = updated.productiveStudySecondsToday
+        let newStudy = prevStudy + seconds
+        updated.productiveStudySecondsToday = newStudy
+        save(updated)
+
+        if let rule = activeRule {
+            let targetSeconds = rule.productiveMinutesTarget * 60
+            let rewardSeconds = Int(Float(rule.rewardMinutes * 60) * updated.effectiveBoostMultiplier)
+
+            // If initial target was reached on this addition, credit the first interval reward
+            if prevStudy < targetSeconds && newStudy >= targetSeconds {
+                addRewardSeconds(rewardSeconds)
+            } else if prevStudy >= targetSeconds {
+                // Subsequent study: add proportional reward
+                let additionalReward = Int(Double(seconds) * (Double(rule.rewardMinutes) / Double(rule.productiveMinutesTarget)))
+                if additionalReward > 0 {
+                    addRewardSeconds(additionalReward)
+                }
+            }
+        }
+    }
+
     public func addRewardSeconds(_ seconds: Int) {
         checkAndPerformDayResetIfNeeded()
         guard seconds > 0 else { return }
@@ -95,8 +121,9 @@ public class WalletManager: ObservableObject {
         }
 
         let trimmed = passphrase.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= 35 else {
-            return (false, "Passphrase must be at least 35 symbols.")
+        let validation = RuleEngine.validateEmergencyPassphrase(trimmed)
+        guard validation.isValid else {
+            return (false, validation.error ?? "Passphrase does not meet security requirements.")
         }
 
         if let stored = activeRule?.emergencyPassword, !stored.isEmpty {
@@ -125,6 +152,7 @@ public class WalletManager: ObservableObject {
         updated.availableSeconds = 0 // Expire all wallet at end of day
         updated.earnedTodaySeconds = 0
         updated.spentTodaySeconds = 0
+        updated.productiveStudySecondsToday = 0
         updated.emergencyUnlockUsedToday = false
         updated.lastResetAt = Date()
         save(updated)

@@ -42,13 +42,31 @@ class EarnSessionManager(
             _isAccruing.value = true
             _activeProductivePackage.value = currentPackage
 
-            val rewardRatePerSecond = (rule.rewardMinutes.toDouble() / rule.productiveMinutesTarget.toDouble()) * wallet.effectiveBoostMultiplier
-            pendingSeconds += rewardRatePerSecond
+            // 1. Record productive study time
+            val prevStudySeconds = wallet.productiveStudySecondsToday
+            val newStudySeconds = prevStudySeconds + 1L
+            walletManager.addProductiveStudySeconds(1L)
 
-            if (pendingSeconds >= 1.0) {
-                val addSec = pendingSeconds.toLong()
-                pendingSeconds -= addSec
-                walletManager.addRewardSeconds(addSec)
+            val targetSeconds = rule.productiveMinutesTarget * 60L
+            val rewardPerTargetSeconds = (rule.rewardMinutes * 60L * wallet.effectiveBoostMultiplier).toLong()
+
+            // 2. Initial minimum interval milestone
+            if (prevStudySeconds < targetSeconds) {
+                // User is working toward their first minimum study requirement of the day
+                if (newStudySeconds >= targetSeconds) {
+                    // Milestone achieved! Deposit first full interval reward
+                    walletManager.addRewardSeconds(rewardPerTargetSeconds)
+                }
+            } else {
+                // Initial daily target was already fulfilled. Accrue subsequent rewards incrementally
+                val rewardRatePerSecond = (rule.rewardMinutes.toDouble() / rule.productiveMinutesTarget.toDouble()) * wallet.effectiveBoostMultiplier
+                pendingSeconds += rewardRatePerSecond
+
+                if (pendingSeconds >= 1.0) {
+                    val addSec = pendingSeconds.toLong()
+                    pendingSeconds -= addSec
+                    walletManager.addRewardSeconds(addSec)
+                }
             }
         } else {
             _isAccruing.value = false

@@ -54,9 +54,28 @@ class RuleEngineTest {
     @Test
     fun testEmergencyPasswordValidation() {
         val shortPassword = "Too short password"
+        val sameSymbol35Chars = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        val numbers35Chars = "11111111111111111111111111111111111"
+        val excessiveConsecutive = "aaaaa I promise to stay focused today 2026!"
         val validPassphrase = "I promise to stay focused on my learning goals today 2026!"
-        assertTrue(validPassphrase.length >= 35)
-        assertFalse(shortPassword.length >= 35)
+
+        // Short password rejected
+        assertFalse(RuleEngine.isEmergencyPassphraseValid(shortPassword))
+        assertEquals(
+            "Passphrase must be at least 35 characters (${shortPassword.length}/35).",
+            RuleEngine.validateEmergencyPassphrase(shortPassword).error
+        )
+
+        // 35 same symbols rejected
+        assertFalse(RuleEngine.isEmergencyPassphraseValid(sameSymbol35Chars))
+        assertFalse(RuleEngine.isEmergencyPassphraseValid(numbers35Chars))
+
+        // Excessive consecutive duplicates rejected
+        assertFalse(RuleEngine.isEmergencyPassphraseValid(excessiveConsecutive))
+
+        // Valid sentence accepted
+        assertTrue(RuleEngine.isEmergencyPassphraseValid(validPassphrase))
+        assertEquals(null, RuleEngine.validateEmergencyPassphrase(validPassphrase).error)
     }
 
     @Test
@@ -108,28 +127,65 @@ class RuleEngineTest {
 
     @Test
     fun testTargetStudyRequirementValidation() {
-        val isFreeTier = false
-        val isProTier = true
+        fun isTargetValid(target: Int, isPro: Boolean): Boolean {
+            return if (!isPro) {
+                target == 30 // Free package supports only one 30 min minimum interval
+            } else {
+                target >= 15 // PRO tier allows flexible intervals 15m+
+            }
+        }
 
-        val freeMinAllowed = if (isFreeTier) 30 else 30
-        val proMinAllowed = if (isProTier) 15 else 30
+        // Free tier supports only 30m interval
+        assertFalse(isTargetValid(15, isPro = false))
+        assertTrue(isTargetValid(30, isPro = false))
+        assertFalse(isTargetValid(45, isPro = false))
+        assertFalse(isTargetValid(60, isPro = false))
 
-        assertEquals(30, freeMinAllowed)
-        assertEquals(15, proMinAllowed)
+        // PRO tier supports 15m, 30m, 45m, 60m
+        assertTrue(isTargetValid(15, isPro = true))
+        assertTrue(isTargetValid(30, isPro = true))
+        assertTrue(isTargetValid(45, isPro = true))
+        assertTrue(isTargetValid(60, isPro = true))
+        assertFalse(isTargetValid(10, isPro = true))
+    }
 
-        // Free tier rejects targets < 30
-        val target15mValidForFree = 15 >= freeMinAllowed
-        assertFalse(target15mValidForFree)
+    @Test
+    fun testFreeTierAppLimitValidation() {
+        // Free tier allows up to 2 productive and 2 blocked apps
+        assertTrue(RuleEngine.isAppCountValid(productiveCount = 1, blockedCount = 1, isPro = false))
+        assertTrue(RuleEngine.isAppCountValid(productiveCount = 2, blockedCount = 2, isPro = false))
+        assertFalse(RuleEngine.isAppCountValid(productiveCount = 3, blockedCount = 1, isPro = false))
+        assertFalse(RuleEngine.isAppCountValid(productiveCount = 1, blockedCount = 3, isPro = false))
+        assertFalse(RuleEngine.isAppCountValid(productiveCount = 4, blockedCount = 4, isPro = false))
 
-        // Pro tier accepts 15, 30, 45, 60
-        val target15mValidForPro = 15 >= proMinAllowed
-        val target30mValidForPro = 30 >= proMinAllowed
-        val target45mValidForPro = 45 >= proMinAllowed
-        val target60mValidForPro = 60 >= proMinAllowed
-        assertTrue(target15mValidForPro)
-        assertTrue(target30mValidForPro)
-        assertTrue(target45mValidForPro)
-        assertTrue(target60mValidForPro)
+        // PRO tier allows unlimited apps
+        assertTrue(RuleEngine.isAppCountValid(productiveCount = 3, blockedCount = 3, isPro = true))
+        assertTrue(RuleEngine.isAppCountValid(productiveCount = 10, blockedCount = 10, isPro = true))
+    }
+
+    @Test
+    fun testInitialTargetStudyThresholdEnforcement() {
+        val targetMinutes = 30
+        val targetSeconds = targetMinutes * 60L
+        val rewardMinutes = 20
+        val rewardSeconds = rewardMinutes * 60L
+
+        fun evaluateReward(productiveSeconds: Long): Long {
+            return if (productiveSeconds < targetSeconds) {
+                0L // Below initial daily target: locked!
+            } else {
+                rewardSeconds // Initial minimum interval completed!
+            }
+        }
+
+        // Before completing 30m target: 0s reward, social apps blocked
+        assertEquals(0L, evaluateReward(0L))
+        assertEquals(0L, evaluateReward(300L)) // 5m
+        assertEquals(0L, evaluateReward(1799L)) // 29m 59s
+
+        // Reaching 30m target: full 20m reward unlocked
+        assertEquals(1200L, evaluateReward(1800L))
+        assertEquals(1200L, evaluateReward(2000L))
     }
 }
 

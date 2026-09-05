@@ -18,10 +18,18 @@ struct OnboardingView: View {
     private let minPasswordLength = 35
 
     private var isCurrentStepValid: Bool {
-        if currentStep == 3 {
-            return emergencyPassword.trimmingCharacters(in: .whitespacesAndNewlines).count >= minPasswordLength
+        switch currentStep {
+        case 1:
+            let count = productiveSelection.applicationTokens.count + productiveSelection.categoryTokens.count + productiveSelection.webDomainTokens.count
+            return count > 0 && count <= RuleEngine.maxFreeTierAppsPerCategory
+        case 2:
+            let count = blockedSelection.applicationTokens.count + blockedSelection.categoryTokens.count + blockedSelection.webDomainTokens.count
+            return count > 0 && count <= RuleEngine.maxFreeTierAppsPerCategory
+        case 3:
+            return RuleEngine.isEmergencyPassphraseValid(emergencyPassword)
+        default:
+            return true
         }
-        return true
     }
 
     var body: some View {
@@ -29,13 +37,14 @@ struct OnboardingView: View {
             Color(red: 15/255.0, green: 23/255.0, blue: 42/255.0)
                 .ignoresSafeArea()
 
-            VStack {
-                // Progress Indicator Dots
+            VStack(spacing: 24) {
+                // Header Progress Dots
                 HStack(spacing: 8) {
                     ForEach(0..<totalSteps, id: \.self) { index in
                         Capsule()
                             .fill(index == currentStep ? Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0) : Color(red: 51/255.0, green: 65/255.0, blue: 85/255.0))
                             .frame(width: index == currentStep ? 24 : 8, height: 6)
+                            .animation(.spring(), value: currentStep)
                     }
                 }
                 .padding(.top, 20)
@@ -49,7 +58,7 @@ struct OnboardingView: View {
                 case 1:
                     AppSelectionStepView(
                         title: "Target / Productive Apps",
-                        subtitle: "Select study apps (Quizlet, Duolingo, Khan Academy, etc.) that earn you reward time.",
+                        subtitle: "Select up to 2 study apps (Quizlet, Duolingo, etc.) that earn you reward time. (Free Limit: 2 apps, PRO: Unlimited)",
                         selection: $productiveSelection,
                         isPickerPresented: $isProductivePickerPresented,
                         accentColor: Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0)
@@ -57,7 +66,7 @@ struct OnboardingView: View {
                 case 2:
                     AppSelectionStepView(
                         title: "Blocked / Distractor Apps",
-                        subtitle: "Select social apps (Instagram, TikTok, YouTube, etc.) that consume your wallet.",
+                        subtitle: "Select up to 2 distractor apps (Instagram, TikTok, YouTube, etc.) that consume your wallet. (Free Limit: 2 apps, PRO: Unlimited)",
                         selection: $blockedSelection,
                         isPickerPresented: $isBlockedPickerPresented,
                         accentColor: Color(red: 244/255.0, green: 63/255.0, blue: 94/255.0)
@@ -157,7 +166,7 @@ struct AppSelectionStepView: View {
     let accentColor: Color
 
     private var selectionCount: Int {
-        selection.applicationTokens.count + selection.categoryTokens.count
+        selection.applicationTokens.count + selection.categoryTokens.count + selection.webDomainTokens.count
     }
 
     var body: some View {
@@ -189,7 +198,15 @@ struct AppSelectionStepView: View {
             .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
 
             if selectionCount > 0 {
-                Text("\(selection.applicationTokens.count) apps, \(selection.categoryTokens.count) categories selected")
+                let appsCount = selection.applicationTokens.count
+                let catsCount = selection.categoryTokens.count
+                let domainsCount = selection.webDomainTokens.count
+                let text = [
+                    appsCount > 0 ? "\(appsCount) apps" : nil,
+                    catsCount > 0 ? "\(catsCount) categories" : nil,
+                    domainsCount > 0 ? "\(domainsCount) web domains" : nil
+                ].compactMap { $0 }.joined(separator: ", ")
+                Text("\(text.isEmpty ? "\(selectionCount) items" : text) selected")
                     .font(.caption)
                     .foregroundColor(accentColor)
             }
@@ -207,8 +224,12 @@ struct EmergencyPasswordStepView: View {
         password.trimmingCharacters(in: .whitespacesAndNewlines).count
     }
 
+    private var validation: PassphraseValidationResult {
+        RuleEngine.validateEmergencyPassphrase(password)
+    }
+
     private var isValid: Bool {
-        length >= minLength
+        validation.isValid
     }
 
     var body: some View {
@@ -230,7 +251,7 @@ struct EmergencyPasswordStepView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.white)
 
-            Text("Create an emergency passphrase of at least 35 symbols. When apps are shielded, typing this phrase provides emergency unlock.")
+            Text("Create an emergency passphrase of at least 35 symbols. When apps are shielded, typing this phrase provides emergency unlock. Avoid repetitive duplicate symbols.")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(Color(red: 148/255.0, green: 163/255.0, blue: 184/255.0))
@@ -260,7 +281,7 @@ struct EmergencyPasswordStepView: View {
                 )
 
                 HStack {
-                    Text(isValid ? "✓ Passphrase length valid" : "Requires \(max(0, minLength - length)) more symbols")
+                    Text(isValid ? "✓ Passphrase valid" : (validation.error ?? "Requires \(max(0, minLength - length)) more symbols"))
                         .font(.caption)
                         .foregroundColor(isValid ? .green : (length > 0 ? .orange : Color(red: 148/255.0, green: 163/255.0, blue: 184/255.0)))
 

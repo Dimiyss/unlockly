@@ -63,17 +63,75 @@ struct HomeView: View {
                         // Wallet Balance Gauge Card
                         WalletGaugeCard(wallet: walletManager.wallet)
 
+                        // Initial Study Target Card
+                        let targetMinutes = walletManager.activeRule?.productiveMinutesTarget ?? 30
+                        let targetSeconds = targetMinutes * 60
+                        let studiedSeconds = walletManager.wallet.productiveStudySecondsToday
+                        let isCompleted = studiedSeconds >= targetSeconds
+                        let progress = targetSeconds > 0 ? min(1.0, Double(studiedSeconds) / Double(targetSeconds)) : 1.0
+                        let rewardMinutes = walletManager.activeRule?.rewardMinutes ?? 20
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                HStack(spacing: 8) {
+                                    Image(systemName: isCompleted ? "checkmark.circle.fill" : "book.closed.fill")
+                                        .foregroundColor(isCompleted ? Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0) : Color.orange)
+                                    Text("Initial Study Target")
+                                        .font(.subheadline)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                }
+
+                                Spacer()
+
+                                Text(isCompleted ? "✅ Unlocked" : "🔒 Locked")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(isCompleted ? Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0) : Color(red: 244/255.0, green: 63/255.0, blue: 94/255.0))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background((isCompleted ? Color.green : Color.red).opacity(0.15))
+                                    .cornerRadius(6)
+                            }
+
+                            ProgressView(value: progress)
+                                .accentColor(isCompleted ? Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0) : Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0))
+
+                            HStack {
+                                Text("\(studiedSeconds / 60)m / \(targetMinutes)m required")
+                                    .font(.caption)
+                                    .foregroundColor(isCompleted ? Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0) : Color(red: 148/255.0, green: 163/255.0, blue: 184/255.0))
+
+                                Spacer()
+
+                                Text(isCompleted ? "+\(rewardMinutes)m reward credited" : "Reward: +\(rewardMinutes)m allowance")
+                                    .font(.caption)
+                                    .foregroundColor(Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0))
+                            }
+                        }
+                        .padding()
+                        .background(Color(red: 30/255.0, green: 41/255.0, blue: 59/255.0))
+                        .cornerRadius(16)
+                        .padding(.horizontal)
+
                         // Daily Metrics Row
-                        HStack(spacing: 16) {
+                        HStack(spacing: 10) {
                             MetricBox(
-                                title: "Earned Today",
+                                title: "Studied",
+                                value: formatMinutes(walletManager.wallet.productiveStudySecondsToday),
+                                icon: "book.fill",
+                                color: Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0)
+                            )
+
+                            MetricBox(
+                                title: "Earned",
                                 value: formatMinutes(walletManager.wallet.earnedTodaySeconds),
                                 icon: "arrow.up.right.circle.fill",
                                 color: Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0)
                             )
 
                             MetricBox(
-                                title: "Spent Today",
+                                title: "Spent",
                                 value: formatMinutes(walletManager.wallet.spentTodaySeconds),
                                 icon: "arrow.down.right.circle.fill",
                                 color: Color(red: 244/255.0, green: 63/255.0, blue: 94/255.0)
@@ -308,7 +366,7 @@ struct ActiveRuleBox: View {
                     .font(.subheadline)
                     .foregroundColor(Color(red: 148/255.0, green: 163/255.0, blue: 184/255.0))
                 Spacer()
-                let productiveCount = (rule?.productiveSelection.applicationTokens.count ?? 0) + (rule?.productiveSelection.categoryTokens.count ?? 0)
+                let productiveCount = (rule?.productiveSelection.applicationTokens.count ?? 0) + (rule?.productiveSelection.categoryTokens.count ?? 0) + (rule?.productiveSelection.webDomainTokens.count ?? 0)
                 Text("\(productiveCount) configured")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -320,7 +378,7 @@ struct ActiveRuleBox: View {
                     .font(.subheadline)
                     .foregroundColor(Color(red: 148/255.0, green: 163/255.0, blue: 184/255.0))
                 Spacer()
-                let blockedCount = (rule?.blockedSelection.applicationTokens.count ?? 0) + (rule?.blockedSelection.categoryTokens.count ?? 0)
+                let blockedCount = (rule?.blockedSelection.applicationTokens.count ?? 0) + (rule?.blockedSelection.categoryTokens.count ?? 0) + (rule?.blockedSelection.webDomainTokens.count ?? 0)
                 Text("\(blockedCount) shielded")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -526,11 +584,11 @@ struct EmergencyUnlockSheet: View {
                             .fontWeight(.bold)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(input.trimmingCharacters(in: .whitespacesAndNewlines).count >= minLength ? Color.green : Color.gray.opacity(0.3))
+                            .background(RuleEngine.isEmergencyPassphraseValid(input) ? Color.green : Color.gray.opacity(0.3))
                             .foregroundColor(.white)
                             .cornerRadius(12)
                     }
-                    .disabled(input.trimmingCharacters(in: .whitespacesAndNewlines).count < minLength)
+                    .disabled(!RuleEngine.isEmergencyPassphraseValid(input))
                     .padding(.horizontal)
 
                     Spacer()

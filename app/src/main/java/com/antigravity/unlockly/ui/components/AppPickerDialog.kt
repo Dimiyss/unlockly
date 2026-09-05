@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,12 @@ import androidx.compose.ui.window.DialogProperties
 import com.antigravity.unlockly.data.model.InstalledApp
 import com.antigravity.unlockly.ui.theme.*
 
+enum class AppSelectionFilter {
+    ALL,
+    SELECTED,
+    UNSELECTED
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppPickerDialog(
@@ -38,20 +46,40 @@ fun AppPickerDialog(
     accentColor: Color = PrimaryIndigo,
     installedApps: List<InstalledApp>,
     selectedPackages: Set<String>,
+    excludedPackages: Set<String> = emptySet(),
+    excludedLabel: String = "Already chosen in another rule",
+    maxSelection: Int? = null,
     onSaveSelection: (Set<String>) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
-    var currentSelection by remember(selectedPackages) { mutableStateOf(selectedPackages) }
+    var activeFilter by remember { mutableStateOf(AppSelectionFilter.ALL) }
+    
+    // Filter out packages that are not actually in installedApps to avoid ghost counts
+    val installedPackageNames = remember(installedApps) { installedApps.map { it.packageName }.toSet() }
+    var currentSelection by remember(selectedPackages, installedPackageNames) {
+        mutableStateOf(selectedPackages.intersect(installedPackageNames))
+    }
 
-    val filteredApps = remember(searchQuery, installedApps) {
-        if (searchQuery.isBlank()) {
-            installedApps
-        } else {
-            installedApps.filter {
-                it.name.contains(searchQuery, ignoreCase = true) ||
-                        it.packageName.contains(searchQuery, ignoreCase = true)
+    val selectedCount = currentSelection.size
+
+    val filteredApps = remember(searchQuery, installedApps, activeFilter, currentSelection) {
+        installedApps.filter { app ->
+            val matchesSearch = if (searchQuery.isBlank()) {
+                true
+            } else {
+                app.name.contains(searchQuery, ignoreCase = true) ||
+                        app.packageName.contains(searchQuery, ignoreCase = true)
             }
+
+            val matchesFilter = when (activeFilter) {
+                AppSelectionFilter.ALL -> true
+                AppSelectionFilter.SELECTED -> currentSelection.contains(app.packageName)
+                AppSelectionFilter.UNSELECTED -> !currentSelection.contains(app.packageName)
+            }
+
+            matchesSearch && matchesFilter
         }
     }
 
@@ -62,7 +90,7 @@ fun AppPickerDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.95f)
-                .fillMaxHeight(0.88f)
+                .fillMaxHeight(0.90f)
                 .padding(8.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = BackgroundDark),
@@ -102,7 +130,7 @@ fun AppPickerDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Search Bar
                 OutlinedTextField(
@@ -142,27 +170,117 @@ fun AppPickerDialog(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Filter Tabs / Chips (All, Selected, Unselected)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = activeFilter == AppSelectionFilter.ALL,
+                        onClick = { activeFilter = AppSelectionFilter.ALL },
+                        label = { Text("All (${installedApps.size})", fontSize = 12.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = accentColor.copy(alpha = 0.2f),
+                            selectedLabelColor = accentColor,
+                            containerColor = SurfaceDark,
+                            labelColor = TextSecondary
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            borderColor = if (activeFilter == AppSelectionFilter.ALL) accentColor else SurfaceVariantDark,
+                            selectedBorderColor = accentColor,
+                            enabled = true,
+                            selected = activeFilter == AppSelectionFilter.ALL
+                        )
+                    )
+
+                    FilterChip(
+                        selected = activeFilter == AppSelectionFilter.SELECTED,
+                        onClick = { activeFilter = AppSelectionFilter.SELECTED },
+                        label = { Text("Already Chosen ($selectedCount)", fontSize = 12.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = accentColor.copy(alpha = 0.2f),
+                            selectedLabelColor = accentColor,
+                            containerColor = SurfaceDark,
+                            labelColor = TextSecondary
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            borderColor = if (activeFilter == AppSelectionFilter.SELECTED) accentColor else SurfaceVariantDark,
+                            selectedBorderColor = accentColor,
+                            enabled = true,
+                            selected = activeFilter == AppSelectionFilter.SELECTED
+                        )
+                    )
+
+                    FilterChip(
+                        selected = activeFilter == AppSelectionFilter.UNSELECTED,
+                        onClick = { activeFilter = AppSelectionFilter.UNSELECTED },
+                        label = { Text("Unselected (${maxOf(0, installedApps.size - selectedCount)})", fontSize = 12.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = accentColor.copy(alpha = 0.2f),
+                            selectedLabelColor = accentColor,
+                            containerColor = SurfaceDark,
+                            labelColor = TextSecondary
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            borderColor = if (activeFilter == AppSelectionFilter.UNSELECTED) accentColor else SurfaceVariantDark,
+                            selectedBorderColor = accentColor,
+                            enabled = true,
+                            selected = activeFilter == AppSelectionFilter.UNSELECTED
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
                 // Selected Count & Quick Actions Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Selected ${currentSelection.size} of ${installedApps.size} apps",
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            color = accentColor,
-                            fontWeight = FontWeight.SemiBold
+                    Column {
+                        Text(
+                            text = if (maxSelection != null) {
+                                "Selected $selectedCount / $maxSelection apps (Free Plan)"
+                            } else {
+                                "Selected $selectedCount of ${installedApps.size} apps (PRO: Unlimited)"
+                            },
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = if (maxSelection != null && selectedCount >= maxSelection) WarningAmber else accentColor,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
-                    )
+                        if (maxSelection != null && selectedCount >= maxSelection) {
+                            Text(
+                                text = "Limit reached • Upgrade to PRO for unlimited",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = WarningAmber,
+                                    fontSize = 10.sp
+                                )
+                            )
+                        }
+                    }
 
                     Row {
                         TextButton(
                             onClick = {
-                                currentSelection = if (searchQuery.isBlank()) {
-                                    installedApps.map { it.packageName }.toSet()
+                                val selectableFiltered = filteredApps
+                                    .filter { !excludedPackages.contains(it.packageName) }
+                                    .map { it.packageName }
+                                
+                                if (maxSelection != null) {
+                                    val availableSlots = maxOf(0, maxSelection - currentSelection.size)
+                                    val toAdd = selectableFiltered.filter { !currentSelection.contains(it) }.take(availableSlots)
+                                    currentSelection = currentSelection + toAdd
+                                    if (selectableFiltered.size > availableSlots) {
+                                        Toast.makeText(
+                                            context,
+                                            "Free tier allows up to $maxSelection apps. Upgrade to PRO for unlimited apps.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 } else {
-                                    currentSelection + filteredApps.map { it.packageName }
+                                    currentSelection = currentSelection + selectableFiltered
                                 }
                             },
                             contentPadding = PaddingValues(horizontal = 8.dp)
@@ -172,11 +290,8 @@ fun AppPickerDialog(
 
                         TextButton(
                             onClick = {
-                                currentSelection = if (searchQuery.isBlank()) {
-                                    emptySet()
-                                } else {
-                                    currentSelection - filteredApps.map { it.packageName }.toSet()
-                                }
+                                val filteredPkgs = filteredApps.map { it.packageName }.toSet()
+                                currentSelection = currentSelection - filteredPkgs
                             },
                             contentPadding = PaddingValues(horizontal = 8.dp)
                         ) {
@@ -185,7 +300,7 @@ fun AppPickerDialog(
                     }
                 }
 
-                Divider(color = SurfaceVariantDark, thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
+                HorizontalDivider(color = SurfaceVariantDark, thickness = 1.dp, modifier = Modifier.padding(vertical = 4.dp))
 
                 // Apps List
                 if (filteredApps.isEmpty()) {
@@ -196,7 +311,11 @@ fun AppPickerDialog(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No apps found matching \"$searchQuery\"",
+                            text = if (activeFilter == AppSelectionFilter.SELECTED && selectedCount == 0) {
+                                "No apps have been chosen yet."
+                            } else {
+                                "No apps found matching criteria."
+                            },
                             color = TextMuted,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -210,15 +329,28 @@ fun AppPickerDialog(
                     ) {
                         items(filteredApps, key = { it.packageName }) { app ->
                             val isSelected = currentSelection.contains(app.packageName)
+                            val isExcluded = excludedPackages.contains(app.packageName)
                             AppRowItem(
                                 app = app,
                                 isSelected = isSelected,
+                                isExcluded = isExcluded,
+                                excludedLabel = excludedLabel,
                                 accentColor = accentColor,
                                 onToggle = {
-                                    currentSelection = if (isSelected) {
-                                        currentSelection - app.packageName
-                                    } else {
-                                        currentSelection + app.packageName
+                                    if (!isExcluded) {
+                                        if (isSelected) {
+                                            currentSelection = currentSelection - app.packageName
+                                        } else {
+                                            if (maxSelection != null && currentSelection.size >= maxSelection) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Free tier allows selecting up to $maxSelection apps. Upgrade to PRO for unlimited apps.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            } else {
+                                                currentSelection = currentSelection + app.packageName
+                                            }
+                                        }
                                     }
                                 }
                             )
@@ -244,15 +376,24 @@ fun AppPickerDialog(
 
                     Button(
                         onClick = {
+                            if (maxSelection != null && currentSelection.size > maxSelection) {
+                                Toast.makeText(
+                                    context,
+                                    "Free tier allows up to $maxSelection apps. Upgrade to PRO for unlimited apps.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@Button
+                            }
                             onSaveSelection(currentSelection)
                             onDismiss()
                         },
+                        enabled = !(maxSelection != null && selectedCount > maxSelection),
                         modifier = Modifier.weight(1.5f),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = accentColor)
                     ) {
                         Text(
-                            text = "Save Selection (${currentSelection.size})",
+                            text = "Save Selection ($selectedCount)",
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -267,13 +408,20 @@ fun AppPickerDialog(
 private fun AppRowItem(
     app: InstalledApp,
     isSelected: Boolean,
+    isExcluded: Boolean = false,
+    excludedLabel: String = "",
     accentColor: Color,
     onToggle: () -> Unit
 ) {
     Surface(
         onClick = onToggle,
+        enabled = !isExcluded,
         shape = RoundedCornerShape(12.dp),
-        color = if (isSelected) SurfaceDark else Color.Transparent,
+        color = when {
+            isExcluded -> SurfaceDark.copy(alpha = 0.35f)
+            isSelected -> SurfaceDark
+            else -> Color.Transparent
+        },
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -293,15 +441,15 @@ private fun AppRowItem(
                     text = app.name,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        color = TextPrimary
+                        color = if (isExcluded) TextMuted else TextPrimary
                     ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = app.packageName,
+                    text = if (isExcluded && excludedLabel.isNotEmpty()) excludedLabel else app.packageName,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = TextMuted,
+                        color = if (isExcluded) WarningAmber else TextMuted,
                         fontSize = 11.sp
                     ),
                     maxLines = 1,
@@ -311,16 +459,25 @@ private fun AppRowItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Checkbox
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = { onToggle() },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = accentColor,
-                    uncheckedColor = TextMuted,
-                    checkmarkColor = Color.White
+            // Checkbox or Excluded indicator
+            if (isExcluded) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Excluded",
+                    tint = TextMuted,
+                    modifier = Modifier.size(20.dp)
                 )
-            )
+            } else {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckedChange = { onToggle() },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = accentColor,
+                        uncheckedColor = TextMuted,
+                        checkmarkColor = Color.White
+                    )
+                )
+            }
         }
     }
 }

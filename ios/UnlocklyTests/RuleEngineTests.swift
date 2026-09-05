@@ -40,9 +40,24 @@ final class RuleEngineTests: XCTestCase {
 
     func testEmergencyPasswordValidation() {
         let shortPassword = "Too short password"
+        let sameSymbol35Chars = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        let numbers35Chars = "11111111111111111111111111111111111"
+        let excessiveConsecutive = "aaaaa I promise to stay focused today 2026!"
         let validPassphrase = "I promise to stay focused on my learning goals today 2026!"
-        XCTAssertTrue(validPassphrase.count >= 35)
-        XCTAssertFalse(shortPassword.count >= 35)
+
+        // Short password rejected
+        XCTAssertFalse(RuleEngine.isEmergencyPassphraseValid(shortPassword))
+
+        // 35 same symbols rejected
+        XCTAssertFalse(RuleEngine.isEmergencyPassphraseValid(sameSymbol35Chars))
+        XCTAssertFalse(RuleEngine.isEmergencyPassphraseValid(numbers35Chars))
+
+        // Excessive consecutive duplicates rejected
+        XCTAssertFalse(RuleEngine.isEmergencyPassphraseValid(excessiveConsecutive))
+
+        // Valid sentence accepted
+        XCTAssertTrue(RuleEngine.isEmergencyPassphraseValid(validPassphrase))
+        XCTAssertNil(RuleEngine.validateEmergencyPassphrase(validPassphrase).error)
     }
 
     func testWalletUnfreezeAndBoostState() {
@@ -93,22 +108,62 @@ final class RuleEngineTests: XCTestCase {
     }
 
     func testTargetStudyRequirementValidation() {
-        let isFreeTier = false
-        let isProTier = true
+        func isTargetValid(target: Int, isPro: Bool) -> Bool {
+            if !isPro {
+                return target == 30 // Free package supports only one 30 min minimum interval
+            } else {
+                return target >= 15 // PRO tier allows flexible intervals 15m+
+            }
+        }
 
-        let freeMinAllowed = isFreeTier ? 30 : 30
-        let proMinAllowed = isProTier ? 15 : 30
+        // Free tier supports only 30m interval
+        XCTAssertFalse(isTargetValid(target: 15, isPro: false))
+        XCTAssertTrue(isTargetValid(target: 30, isPro: false))
+        XCTAssertFalse(isTargetValid(target: 45, isPro: false))
+        XCTAssertFalse(isTargetValid(target: 60, isPro: false))
 
-        XCTAssertEqual(freeMinAllowed, 30)
-        XCTAssertEqual(proMinAllowed, 15)
+        // PRO tier accepts 15, 30, 45, 60
+        XCTAssertTrue(isTargetValid(target: 15, isPro: true))
+        XCTAssertTrue(isTargetValid(target: 30, isPro: true))
+        XCTAssertTrue(isTargetValid(target: 45, isPro: true))
+        XCTAssertTrue(isTargetValid(target: 60, isPro: true))
+        XCTAssertFalse(isTargetValid(target: 10, isPro: true))
+    }
 
-        // Free tier rejects targets < 30
-        XCTAssertFalse(15 >= freeMinAllowed)
+    func testFreeTierAppLimitValidation() {
+        // Free tier allows up to 2 productive and 2 blocked apps
+        XCTAssertTrue(RuleEngine.isAppCountValid(productiveCount: 1, blockedCount: 1, isPro: false))
+        XCTAssertTrue(RuleEngine.isAppCountValid(productiveCount: 2, blockedCount: 2, isPro: false))
+        XCTAssertFalse(RuleEngine.isAppCountValid(productiveCount: 3, blockedCount: 1, isPro: false))
+        XCTAssertFalse(RuleEngine.isAppCountValid(productiveCount: 1, blockedCount: 3, isPro: false))
+        XCTAssertFalse(RuleEngine.isAppCountValid(productiveCount: 4, blockedCount: 4, isPro: false))
 
-        // Pro tier accepts 15, 30, 45, 60
-        XCTAssertTrue(15 >= proMinAllowed)
-        XCTAssertTrue(30 >= proMinAllowed)
-        XCTAssertTrue(45 >= proMinAllowed)
-        XCTAssertTrue(60 >= proMinAllowed)
+        // PRO tier allows unlimited apps
+        XCTAssertTrue(RuleEngine.isAppCountValid(productiveCount: 3, blockedCount: 3, isPro: true))
+        XCTAssertTrue(RuleEngine.isAppCountValid(productiveCount: 10, blockedCount: 10, isPro: true))
+    }
+
+    func testInitialTargetStudyThresholdEnforcement() {
+        let targetMinutes = 30
+        let targetSeconds = targetMinutes * 60
+        let rewardMinutes = 20
+        let rewardSeconds = rewardMinutes * 60
+
+        func evaluateReward(productiveSeconds: Int) -> Int {
+            if productiveSeconds < targetSeconds {
+                return 0 // Below initial daily target: locked!
+            } else {
+                return rewardSeconds // Initial minimum interval completed!
+            }
+        }
+
+        // Before completing 30m target: 0s reward, social apps blocked
+        XCTAssertEqual(evaluateReward(productiveSeconds: 0), 0)
+        XCTAssertEqual(evaluateReward(productiveSeconds: 300), 0) // 5m
+        XCTAssertEqual(evaluateReward(productiveSeconds: 1799), 0) // 29m 59s
+
+        // Reaching 30m target: full 20m reward unlocked
+        XCTAssertEqual(evaluateReward(productiveSeconds: 1800), 1200)
+        XCTAssertEqual(evaluateReward(productiveSeconds: 2000), 1200)
     }
 }

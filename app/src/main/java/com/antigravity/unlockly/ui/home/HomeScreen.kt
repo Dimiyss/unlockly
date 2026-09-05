@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -153,10 +154,22 @@ fun HomeScreen(
             // Social Wallet Balance Card
             WalletBalanceCard(wallet = wallet)
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Initial Study Target Milestone Card
+            InitialStudyTargetCard(
+                wallet = wallet,
+                rule = primaryRule
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Today's Metrics Row
-            DailyMetricsRow(earnedSeconds = wallet.earnedTodaySeconds, spentSeconds = wallet.spentTodaySeconds)
+            DailyMetricsRow(
+                studiedSeconds = wallet.productiveStudySecondsToday,
+                earnedSeconds = wallet.earnedTodaySeconds,
+                spentSeconds = wallet.spentTodaySeconds
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -411,8 +424,9 @@ fun HomeScreen(
                 Button(
                     onClick = {
                         val trimmed = emergencyInput.trim()
-                        if (trimmed.length < MIN_PASSWORD_LENGTH) {
-                            emergencyError = "Passphrase must be at least $MIN_PASSWORD_LENGTH symbols."
+                        val validation = com.antigravity.unlockly.domain.RuleEngine.validateEmergencyPassphrase(trimmed)
+                        if (!validation.isValid) {
+                            emergencyError = validation.error ?: "Invalid emergency passphrase."
                             return@Button
                         }
                         if (wallet.emergencyUnlockUsedToday) {
@@ -435,7 +449,7 @@ fun HomeScreen(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
-                    enabled = emergencyInput.trim().length >= MIN_PASSWORD_LENGTH
+                    enabled = com.antigravity.unlockly.domain.RuleEngine.isEmergencyPassphraseValid(emergencyInput)
                 ) {
                     Text("Unlock (+15m)", color = Color.White, fontWeight = FontWeight.Bold)
                 }
@@ -661,13 +675,142 @@ fun StorePromoCard(
 }
 
 @Composable
-fun DailyMetricsRow(earnedSeconds: Long, spentSeconds: Long) {
+fun InitialStudyTargetCard(
+    wallet: Wallet,
+    rule: Rule?
+) {
+    val targetMinutes = rule?.productiveMinutesTarget ?: 30
+    val targetSeconds = targetMinutes * 60L
+    val studiedSeconds = wallet.productiveStudySecondsToday
+    val isCompleted = studiedSeconds >= targetSeconds
+    val progress = if (targetSeconds > 0) (studiedSeconds.toFloat() / targetSeconds.toFloat()).coerceIn(0f, 1f) else 1f
+    val rewardMinutes = rule?.rewardMinutes ?: 20
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isCompleted) SurfaceDark else SurfaceDark.copy(alpha = 0.9f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(
+                                if (isCompleted) SuccessGreen.copy(alpha = 0.15f) else WarningAmber.copy(alpha = 0.15f),
+                                RoundedCornerShape(10.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.School,
+                            contentDescription = null,
+                            tint = if (isCompleted) SuccessGreen else WarningAmber,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column {
+                        Text(
+                            text = "Initial Study Target",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                        )
+                        Text(
+                            text = if (isCompleted) "Target met • ${formatSecondsShort(studiedSeconds)} studied today" else "Minimum requirement before social apps unlock",
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            if (isCompleted) SuccessGreen.copy(alpha = 0.2f) else ErrorRose.copy(alpha = 0.2f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = if (isCompleted) "✅ Unlocked" else "🔒 Locked",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = if (isCompleted) SuccessGreen else ErrorRose,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Progress Bar
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                color = if (isCompleted) SuccessGreen else PrimaryIndigo,
+                trackColor = SurfaceVariantDark
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "${formatSecondsShort(studiedSeconds)} / ${targetMinutes}m required",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = if (isCompleted) SuccessGreen else TextSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
+
+                Text(
+                    text = if (isCompleted) "+${rewardMinutes}m reward credited" else "Reward: +${rewardMinutes}m allowance",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = PrimaryIndigo,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DailyMetricsRow(studiedSeconds: Long, earnedSeconds: Long, spentSeconds: Long) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         MetricCard(
-            title = "Earned Today",
+            title = "Studied",
+            value = formatSecondsShort(studiedSeconds),
+            icon = Icons.Default.School,
+            iconTint = PrimaryIndigo,
+            modifier = Modifier.weight(1f)
+        )
+
+        MetricCard(
+            title = "Earned",
             value = formatSecondsShort(earnedSeconds),
             icon = Icons.Default.ArrowUpward,
             iconTint = SuccessGreen,
@@ -675,7 +818,7 @@ fun DailyMetricsRow(earnedSeconds: Long, spentSeconds: Long) {
         )
 
         MetricCard(
-            title = "Spent Today",
+            title = "Spent",
             value = formatSecondsShort(spentSeconds),
             icon = Icons.Default.ArrowDownward,
             iconTint = ErrorRose,

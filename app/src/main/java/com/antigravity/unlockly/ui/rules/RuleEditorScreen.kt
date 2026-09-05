@@ -27,6 +27,7 @@ import com.antigravity.unlockly.data.model.InstalledApp
 import com.antigravity.unlockly.data.model.InstalledAppHelper
 import com.antigravity.unlockly.data.model.Rule
 import com.antigravity.unlockly.data.model.Wallet
+import com.antigravity.unlockly.domain.RuleEngine
 import com.antigravity.unlockly.ui.components.AppPickerDialog
 import com.antigravity.unlockly.ui.theme.*
 import kotlinx.coroutines.launch
@@ -67,18 +68,27 @@ fun RuleEditorScreen(
     var showProductivePicker by remember { mutableStateOf(false) }
     var showBlockedPicker by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
+    val walletState by app.walletManager.walletFlow.collectAsState(initial = null)
+    val isPro = walletState?.isProActive == true
 
     val passwordLength = emergencyPassword.trim().length
-    val isPasswordValid = passwordLength == 0 || passwordLength >= MIN_PASSWORD_LENGTH
-    val isSaveEnabled = isPasswordValid && (passwordLength >= MIN_PASSWORD_LENGTH || currentRule?.emergencyPassword?.isNotEmpty() == true)
+    val passphraseValidation = remember(emergencyPassword) { RuleEngine.validateEmergencyPassphrase(emergencyPassword) }
+    val isPasswordValid = passwordLength == 0 || passphraseValidation.isValid
+    val isSaveEnabled = isPasswordValid && (passphraseValidation.isValid || currentRule?.emergencyPassword?.isNotEmpty() == true)
+
+    val productiveCount = selectedProductive.count { pkg -> installedApps.any { it.packageName == pkg } }
+    val blockedCount = selectedBlocked.count { pkg -> installedApps.any { it.packageName == pkg } }
 
     if (showProductivePicker) {
         AppPickerDialog(
             title = "Target / Productive Apps",
-            subtitle = "Select study apps that accrue wallet balance",
+            subtitle = if (isPro) "Select study apps that accrue wallet balance (PRO: Unlimited)" else "Select up to 2 study apps (Free Limit: 2 apps)",
             accentColor = SuccessGreen,
             installedApps = installedApps,
             selectedPackages = selectedProductive,
+            excludedPackages = selectedBlocked,
+            excludedLabel = "Already chosen as Blocked App",
+            maxSelection = if (isPro) null else RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY,
             onSaveSelection = { selectedProductive = it },
             onDismiss = { showProductivePicker = false }
         )
@@ -87,10 +97,13 @@ fun RuleEditorScreen(
     if (showBlockedPicker) {
         AppPickerDialog(
             title = "Blocked / Distractor Apps",
-            subtitle = "Select social apps that consume wallet balance",
+            subtitle = if (isPro) "Select social apps that consume wallet balance (PRO: Unlimited)" else "Select up to 2 distractor apps (Free Limit: 2 apps)",
             accentColor = ErrorRose,
             installedApps = installedApps,
             selectedPackages = selectedBlocked,
+            excludedPackages = selectedProductive,
+            excludedLabel = "Already chosen as Target App",
+            maxSelection = if (isPro) null else RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY,
             onSaveSelection = { selectedBlocked = it },
             onDismiss = { showBlockedPicker = false }
         )
@@ -119,7 +132,7 @@ fun RuleEditorScreen(
         ) {
             // Section 1: App Selections
             Text(
-                text = "App Selections (Installed Apps)",
+                text = if (isPro) "App Selections (PRO: Unlimited Apps)" else "App Selections (Free: Max 2 Apps per Category)",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = PrimaryIndigo)
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -127,7 +140,7 @@ fun RuleEditorScreen(
             // Productive Apps Card
             AppSelectionCard(
                 title = "Productive / Target Apps",
-                subtitle = "${selectedProductive.size} apps selected to earn time",
+                subtitle = "$productiveCount apps selected" + if (isPro) " (PRO: Unlimited)" else " ($productiveCount/2 Free Limit)",
                 accentColor = SuccessGreen,
                 icon = Icons.Default.School,
                 onClick = { showProductivePicker = true }
@@ -138,7 +151,7 @@ fun RuleEditorScreen(
             // Blocked Apps Card
             AppSelectionCard(
                 title = "Blocked / Distractor Apps",
-                subtitle = "${selectedBlocked.size} apps selected to shield",
+                subtitle = "$blockedCount apps selected" + if (isPro) " (PRO: Unlimited)" else " ($blockedCount/2 Free Limit)",
                 accentColor = ErrorRose,
                 icon = Icons.Default.Block,
                 onClick = { showBlockedPicker = true }
@@ -147,6 +160,7 @@ fun RuleEditorScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Section 2: Exchange Rate
+
             Text(
                 text = "Exchange Rate Configuration",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = PrimaryIndigo)
@@ -154,24 +168,21 @@ fun RuleEditorScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Target Study Time (First Session Requirement):",
+                text = if (isPro) "Target Study Time (PRO: 15m, 30m, 45m, 1h available):" else "Target Study Time (Free tier: 30m only; 15m is PRO):",
                 style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
             )
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Quick Preset Selection Chips (15m, 30m, 45m, 60m)
-            val walletState by app.walletManager.walletFlow.collectAsState(initial = null)
-            val isPro = walletState?.isProActive == true
-
+            // Quick Preset Selection Chips (15m [PRO], 30m [Free], 45m [PRO], 60m [PRO])
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(
-                    Triple(15, "15m", true), // 15m requires PRO
-                    Triple(30, "30m", false),
-                    Triple(45, "45m", false),
-                    Triple(60, "1h", false)
+                    Triple(15, "15m", true),  // 15m requires PRO
+                    Triple(30, "30m", false), // 30m is the single Free tier interval
+                    Triple(45, "45m", true),  // 45m requires PRO
+                    Triple(60, "1h", true)    // 1h requires PRO
                 ).forEach { (minutes, label, requiresPro) ->
                     val isSelected = targetMinutes == minutes.toString()
                     val isLocked = requiresPro && !isPro
@@ -179,7 +190,11 @@ fun RuleEditorScreen(
                     Surface(
                         onClick = {
                             if (isLocked) {
-                                Toast.makeText(context, "15m target is a PRO feature. Free tier requires minimum 30m study.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Free package supports only the 30m interval. Upgrade to PRO for ${label} and other flexible intervals.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
                                 targetMinutes = minutes.toString()
                             }
@@ -224,7 +239,15 @@ fun RuleEditorScreen(
             OutlinedTextField(
                 value = targetMinutes,
                 onValueChange = { targetMinutes = it },
-                label = { Text("Productive Target Minutes (Min ${if (isPro) 15 else 30}m)") },
+                label = { Text(if (isPro) "Productive Target Minutes (Min 15m)" else "Productive Target Minutes (Free: 30m only)") },
+                supportingText = {
+                    Text(
+                        text = if (isPro) "PRO: 15m, 30m, 45m, 1h and custom targets allowed."
+                        else "Free package supports only 30m target. Upgrade to PRO for 15m and other intervals.",
+                        color = TextSecondary,
+                        fontSize = 11.sp
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -313,21 +336,24 @@ fun RuleEditorScreen(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (passwordLength >= MIN_PASSWORD_LENGTH) "✓ Valid emergency passphrase"
-                    else if (passwordLength > 0) "Requires ${MIN_PASSWORD_LENGTH - passwordLength} more characters"
+                    text = if (passphraseValidation.isValid) "✓ Valid emergency passphrase"
+                    else if (passwordLength > 0) (passphraseValidation.error ?: "Requires ${MIN_PASSWORD_LENGTH - passwordLength} more characters")
                     else "Passphrase required (min 35 symbols)",
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = if (passwordLength >= MIN_PASSWORD_LENGTH) SuccessGreen else if (passwordLength > 0) ErrorRose else TextMuted
-                    )
+                        color = if (passphraseValidation.isValid) SuccessGreen else if (passwordLength > 0) ErrorRose else TextMuted
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "$passwordLength / $MIN_PASSWORD_LENGTH",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontWeight = FontWeight.Bold,
-                        color = if (passwordLength >= MIN_PASSWORD_LENGTH) SuccessGreen else if (passwordLength > 0) ErrorRose else TextMuted
+                        color = if (passphraseValidation.isValid) SuccessGreen else if (passwordLength > 0) ErrorRose else TextMuted
                     )
                 )
             }
@@ -337,11 +363,26 @@ fun RuleEditorScreen(
             Button(
                 onClick = {
                     val parsedTarget = targetMinutes.toIntOrNull() ?: 30
-                    val minAllowed = if (isPro) 15 else 30
-                    if (parsedTarget < minAllowed) {
+                    if (!isPro && parsedTarget != 30) {
                         Toast.makeText(
                             context,
-                            "Free tier requires minimum ${minAllowed}m target study time. Upgrade to PRO for 15m option.",
+                            "Free package supports only the 30m minimum interval at the beginning of the day. Upgrade to PRO for 15m, 45m and flexible options.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@Button
+                    }
+                    if (isPro && parsedTarget < 15) {
+                        Toast.makeText(
+                            context,
+                            "PRO tier requires minimum 15m target study time.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@Button
+                    }
+                    if (!RuleEngine.isAppCountValid(selectedProductive.size, selectedBlocked.size, isPro)) {
+                        Toast.makeText(
+                            context,
+                            "Free plan allows up to ${RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY} apps per category. Upgrade to PRO for unlimited apps.",
                             Toast.LENGTH_LONG
                         ).show()
                         return@Button
@@ -361,7 +402,7 @@ fun RuleEditorScreen(
                         onNavigateBack()
                     }
                 },
-                enabled = passwordLength >= MIN_PASSWORD_LENGTH,
+                enabled = passphraseValidation.isValid,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(

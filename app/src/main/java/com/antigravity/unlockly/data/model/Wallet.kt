@@ -10,6 +10,7 @@ data class Wallet(
     val availableSeconds: Long = 0,
     val earnedTodaySeconds: Long = 0,
     val spentTodaySeconds: Long = 0,
+    val productiveStudySecondsToday: Long = 0L,
     val isProActive: Boolean = false,
     val unfreezeExpirationTimestamp: Long = 0L,
     val boostMultiplier: Float = 1.0f,

@@ -22,6 +22,7 @@ class WalletRepository(private val walletDao: WalletDao) {
                 availableSeconds = 0L, // All wallet expires at end of day
                 earnedTodaySeconds = 0L,
                 spentTodaySeconds = 0L,
+                productiveStudySecondsToday = 0L,
                 emergencyUnlockUsedToday = false,
                 lastResetAt = System.currentTimeMillis()
             )
@@ -34,6 +35,14 @@ class WalletRepository(private val walletDao: WalletDao) {
 
     suspend fun updateWallet(wallet: Wallet) {
         walletDao.insertOrUpdateWallet(wallet)
+    }
+
+    suspend fun addProductiveStudySeconds(seconds: Long) {
+        val current = getWallet()
+        val updated = current.copy(
+            productiveStudySecondsToday = current.productiveStudySecondsToday + seconds
+        )
+        walletDao.insertOrUpdateWallet(updated)
     }
 
     suspend fun addEarnedSeconds(seconds: Long) {
@@ -92,6 +101,7 @@ class WalletRepository(private val walletDao: WalletDao) {
             availableSeconds = 0L, // All wallet expires at the end of the day
             earnedTodaySeconds = 0L,
             spentTodaySeconds = 0L,
+            productiveStudySecondsToday = 0L,
             emergencyUnlockUsedToday = false,
             lastResetAt = System.currentTimeMillis()
         )

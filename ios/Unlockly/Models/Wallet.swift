@@ -4,6 +4,7 @@ public struct Wallet: Codable {
     public var availableSeconds: Int
     public var earnedTodaySeconds: Int
     public var spentTodaySeconds: Int
+    public var productiveStudySecondsToday: Int
     public var isProActive: Bool
     public var unfreezeExpirationTimestamp: Date?
     public var boostMultiplier: Float
@@ -15,6 +16,7 @@ public struct Wallet: Codable {
         availableSeconds: Int = 0,
         earnedTodaySeconds: Int = 0,
         spentTodaySeconds: Int = 0,
+        productiveStudySecondsToday: Int = 0,
         isProActive: Bool = false,
         unfreezeExpirationTimestamp: Date? = nil,
         boostMultiplier: Float = 1.0,
@@ -25,6 +27,7 @@ public struct Wallet: Codable {
         self.availableSeconds = availableSeconds
         self.earnedTodaySeconds = earnedTodaySeconds
         self.spentTodaySeconds = spentTodaySeconds
+        self.productiveStudySecondsToday = productiveStudySecondsToday
         self.isProActive = isProActive
         self.unfreezeExpirationTimestamp = unfreezeExpirationTimestamp
         self.boostMultiplier = boostMultiplier

@@ -27,8 +27,12 @@ struct RuleEditorView: View {
         emergencyPassword.trimmingCharacters(in: .whitespacesAndNewlines).count
     }
 
+    private var passphraseValidation: PassphraseValidationResult {
+        RuleEngine.validateEmergencyPassphrase(emergencyPassword)
+    }
+
     private var isPasswordValid: Bool {
-        passwordLength >= minPasswordLength
+        passwordLength == 0 || passphraseValidation.isValid
     }
 
     var body: some View {
@@ -38,13 +42,15 @@ struct RuleEditorView: View {
                     .ignoresSafeArea()
 
                 Form {
-                    Section(header: Text("App Selections").foregroundColor(Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0))) {
+                    Section(
+                        header: Text(isPro ? "App Selections (PRO: Unlimited)" : "App Selections (Free: Max 2 per Category)").foregroundColor(Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0))
+                    ) {
                         Button(action: { isProductivePickerPresented = true }) {
                             HStack {
                                 Text("Target / Productive Apps")
                                 Spacer()
-                                let count = productiveSelection.applicationTokens.count + productiveSelection.categoryTokens.count
-                                Text(count > 0 ? "\(count) selected" : "Choose")
+                                let count = productiveSelection.applicationTokens.count + productiveSelection.categoryTokens.count + productiveSelection.webDomainTokens.count
+                                Text(count > 0 ? "\(count) selected" + (isPro ? "" : " (\(count)/2)") : "Choose")
                                     .foregroundColor(Color(red: 16/255.0, green: 185/255.0, blue: 129/255.0))
                             }
                         }
@@ -54,8 +60,8 @@ struct RuleEditorView: View {
                             HStack {
                                 Text("Blocked / Distractor Apps")
                                 Spacer()
-                                let count = blockedSelection.applicationTokens.count + blockedSelection.categoryTokens.count
-                                Text(count > 0 ? "\(count) selected" : "Choose")
+                                let count = blockedSelection.applicationTokens.count + blockedSelection.categoryTokens.count + blockedSelection.webDomainTokens.count
+                                Text(count > 0 ? "\(count) selected" + (isPro ? "" : " (\(count)/2)") : "Choose")
                                     .foregroundColor(Color(red: 244/255.0, green: 63/255.0, blue: 94/255.0))
                             }
                         }
@@ -64,22 +70,23 @@ struct RuleEditorView: View {
 
                     Section(
                         header: Text("Exchange Ratio").foregroundColor(Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0)),
-                        footer: Text(targetError ?? (isPro ? "PRO: 15m, 30m, 45m, 1h target configurations available." : "Free package requires minimum 30m study target. Upgrade to PRO for 15m option."))
+                        footer: Text(targetError ?? (isPro ? "PRO: 15m, 30m, 45m, 1h target configurations available." : "Free package supports only 30m target interval and 2 apps per category. Upgrade to PRO for unlimited options."))
                             .foregroundColor(targetError != nil ? .red : .gray)
                     ) {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Target Study Time:")
+                            Text(isPro ? "Target Study Time (PRO Tier):" : "Target Study Time (Free tier: 30m only):")
                                 .font(.caption)
                                 .foregroundColor(.gray)
 
                             HStack(spacing: 8) {
                                 ForEach([15, 30, 45, 60], id: \.self) { mins in
                                     let isSelected = productiveTarget == "\(mins)"
-                                    let isLocked = mins == 15 && !isPro
+                                    let isLocked = (mins != 30) && !isPro
 
                                     Button(action: {
                                         if isLocked {
-                                            targetError = "15m target is a PRO feature. Free tier requires minimum 30m study."
+                                            let label = mins == 60 ? "1h" : "\(mins)m"
+                                            targetError = "\(label) target is a PRO feature. Free tier supports only 30m interval."
                                         } else {
                                             targetError = nil
                                             productiveTarget = "\(mins)"
@@ -91,7 +98,7 @@ struct RuleEditorView: View {
                                                 .fontWeight(.bold)
                                                 .foregroundColor(isSelected ? .white : (isLocked ? .gray : .primary))
 
-                                            if mins == 15 {
+                                            if mins != 30 {
                                                 Text(isPro ? "PRO" : "🔒")
                                                     .font(.system(size: 8, weight: .bold))
                                                     .foregroundColor(isSelected ? .white : .orange)
@@ -109,7 +116,7 @@ struct RuleEditorView: View {
                         .padding(.vertical, 4)
 
                         HStack {
-                            Text("Productive Target (Minutes)")
+                            Text(isPro ? "Productive Target (Minutes)" : "Productive Target (Free: 30m only)")
                             Spacer()
                             TextField("30", text: $productiveTarget)
                                 .keyboardType(.numberPad)
@@ -138,8 +145,8 @@ struct RuleEditorView: View {
 
                     Section(
                         header: Text("Emergency Passphrase (Min 35 Symbols)").foregroundColor(Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0)),
-                        footer: Text(isPasswordValid ? "✓ Valid emergency passphrase length" : "Must be at least 35 symbols (\(passwordLength)/35)")
-                            .foregroundColor(isPasswordValid ? .green : (passwordLength > 0 ? .orange : .gray))
+                        footer: Text(passphraseValidation.isValid ? "✓ Valid emergency passphrase" : (passphraseValidation.error ?? "Must be at least 35 symbols (\(passwordLength)/35)"))
+                            .foregroundColor(passphraseValidation.isValid ? .green : (passwordLength > 0 ? .orange : .gray))
                     ) {
                         HStack {
                             if isSecured {
@@ -173,9 +180,19 @@ struct RuleEditorView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         let target = Int(productiveTarget) ?? 30
-                        let minAllowed = isPro ? 15 : 30
-                        if target < minAllowed {
-                            targetError = "Free package requires minimum \(minAllowed)m target study time."
+                        if !isPro && target != 30 {
+                            targetError = "Free package supports only 30m interval. Upgrade to PRO for 15m, 45m and flexible options."
+                            return
+                        }
+                        if isPro && target < 15 {
+                            targetError = "PRO package requires minimum 15m target study time."
+                            return
+                        }
+
+                        let productiveCount = productiveSelection.applicationTokens.count + productiveSelection.categoryTokens.count + productiveSelection.webDomainTokens.count
+                        let blockedCount = blockedSelection.applicationTokens.count + blockedSelection.categoryTokens.count + blockedSelection.webDomainTokens.count
+                        if !RuleEngine.isAppCountValid(productiveCount: productiveCount, blockedCount: blockedCount, isPro: isPro) {
+                            targetError = "Free package allows up to \(RuleEngine.maxFreeTierAppsPerCategory) apps per category. Upgrade to PRO for unlimited apps."
                             return
                         }
 
@@ -195,8 +212,8 @@ struct RuleEditorView: View {
                         ScreenTimeManager.shared.startMonitoringProductiveSession(rule: rule)
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .disabled(!isPasswordValid)
-                    .foregroundColor(isPasswordValid ? Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0) : .gray)
+                    .disabled(!passphraseValidation.isValid)
+                    .foregroundColor(passphraseValidation.isValid ? Color(red: 99/255.0, green: 102/255.0, blue: 241/255.0) : .gray)
                 }
             }
         }

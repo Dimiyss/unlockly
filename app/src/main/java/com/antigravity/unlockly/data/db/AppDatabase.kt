@@ -12,7 +12,7 @@ import com.antigravity.unlockly.data.model.BlockAttempt
 
 @Database(
     entities = [Rule::class, Wallet::class, EarnSession::class, BlockAttempt::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

@@ -10,6 +10,12 @@ class WalletManager(private val repository: WalletRepository) {
 
     suspend fun getWallet(): Wallet = repository.getWallet()
 
+    suspend fun addProductiveStudySeconds(seconds: Long) {
+        if (seconds > 0) {
+            repository.addProductiveStudySeconds(seconds)
+        }
+    }
+
     suspend fun addRewardSeconds(seconds: Long) {
         if (seconds > 0) {
             repository.addEarnedSeconds(seconds)

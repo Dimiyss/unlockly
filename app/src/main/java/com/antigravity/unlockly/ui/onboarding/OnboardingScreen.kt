@@ -2,6 +2,7 @@ package com.antigravity.unlockly.ui.onboarding
 
 import android.content.Intent
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +40,8 @@ import com.antigravity.unlockly.ui.components.AppIconImage
 import com.antigravity.unlockly.ui.theme.*
 import kotlinx.coroutines.launch
 
+import com.antigravity.unlockly.domain.RuleEngine
+
 private const val MIN_PASSWORD_LENGTH = 35
 
 @Composable
@@ -53,25 +56,32 @@ fun OnboardingScreen(
     var installedApps by remember { mutableStateOf<List<InstalledApp>>(emptyList()) }
     var isLoadingApps by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        installedApps = InstalledAppHelper.getInstalledLauncherApps(context)
-        isLoadingApps = false
-    }
-
     var selectedProductive by remember {
-        mutableStateOf(
-            setOf("com.quizlet.quizlet", "com.duolingo", "com.khanacademy.android", "com.anki")
-        )
+        mutableStateOf<Set<String>>(emptySet())
     }
     var selectedBlocked by remember {
-        mutableStateOf(
-            setOf("com.instagram.android", "com.zhiliaoapp.musically", "com.google.android.youtube", "com.twitter.android")
-        )
+        mutableStateOf<Set<String>>(emptySet())
     }
     var emergencyPassword by remember { mutableStateOf("") }
 
+    LaunchedEffect(Unit) {
+        val apps = InstalledAppHelper.getInstalledLauncherApps(context)
+        installedApps = apps
+        isLoadingApps = false
+
+        // Filter default selections to only those installed on the device (Max 2 for Free Plan)
+        val installedPkgSet = apps.map { it.packageName }.toSet()
+        val defaultProductive = setOf("com.quizlet.quizlet", "com.duolingo", "com.khanacademy.android", "com.anki")
+        val defaultBlocked = setOf("com.instagram.android", "com.zhiliaoapp.musically", "com.google.android.youtube", "com.twitter.android")
+
+        selectedProductive = defaultProductive.intersect(installedPkgSet).take(RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY).toSet()
+        selectedBlocked = (defaultBlocked.intersect(installedPkgSet) - selectedProductive).take(RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY).toSet()
+    }
+
     val isStepValid = when (currentStep) {
-        3 -> emergencyPassword.trim().length >= MIN_PASSWORD_LENGTH
+        1 -> selectedProductive.isNotEmpty() && selectedProductive.size <= RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY
+        2 -> selectedBlocked.isNotEmpty() && selectedBlocked.size <= RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY
+        3 -> RuleEngine.isEmergencyPassphraseValid(emergencyPassword)
         else -> true
     }
 
@@ -123,6 +133,8 @@ fun OnboardingScreen(
                         installedApps = installedApps,
                         isLoading = isLoadingApps,
                         selectedPackages = selectedProductive,
+                        excludedPackages = selectedBlocked,
+                        excludedLabel = "Already chosen as Blocked App",
                         onToggle = { pkg ->
                             selectedProductive = if (selectedProductive.contains(pkg)) {
                                 selectedProductive - pkg
@@ -139,6 +151,8 @@ fun OnboardingScreen(
                         installedApps = installedApps,
                         isLoading = isLoadingApps,
                         selectedPackages = selectedBlocked,
+                        excludedPackages = selectedProductive,
+                        excludedLabel = "Already chosen as Target App",
                         onToggle = { pkg ->
                             selectedBlocked = if (selectedBlocked.contains(pkg)) {
                                 selectedBlocked - pkg
@@ -264,18 +278,34 @@ fun InstalledAppSelectionStep(
     installedApps: List<InstalledApp>,
     isLoading: Boolean,
     selectedPackages: Set<String>,
+    excludedPackages: Set<String> = emptySet(),
+    excludedLabel: String = "Already chosen in another category",
+    maxSelection: Int? = RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY,
     onToggle: (String) -> Unit
 ) {
+    val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
+    var showOnlySelected by remember { mutableStateOf(false) }
 
-    val filteredApps = remember(searchQuery, installedApps) {
-        if (searchQuery.isBlank()) {
-            installedApps
-        } else {
-            installedApps.filter {
-                it.name.contains(searchQuery, ignoreCase = true) ||
-                        it.packageName.contains(searchQuery, ignoreCase = true)
+    val installedPkgSet = remember(installedApps) { installedApps.map { it.packageName }.toSet() }
+    val validSelectedCount = remember(selectedPackages, installedPkgSet) {
+        selectedPackages.intersect(installedPkgSet).size
+    }
+
+    val filteredApps = remember(searchQuery, installedApps, showOnlySelected, selectedPackages) {
+        installedApps.filter { app ->
+            val matchesSearch = if (searchQuery.isBlank()) {
+                true
+            } else {
+                app.name.contains(searchQuery, ignoreCase = true) ||
+                        app.packageName.contains(searchQuery, ignoreCase = true)
             }
+            val matchesFilter = if (showOnlySelected) {
+                selectedPackages.contains(app.packageName)
+            } else {
+                true
+            }
+            matchesSearch && matchesFilter
         }
     }
 
@@ -295,7 +325,7 @@ fun InstalledAppSelectionStep(
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = subtitle, style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary))
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // Search Bar
         OutlinedTextField(
@@ -332,14 +362,46 @@ fun InstalledAppSelectionStep(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Selected summary
-        Text(
-            text = "Selected ${selectedPackages.size} apps",
-            style = MaterialTheme.typography.labelMedium.copy(
-                color = accentColor,
-                fontWeight = FontWeight.SemiBold
+        // Filter chips & selected summary
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FilterChip(
+                    selected = !showOnlySelected,
+                    onClick = { showOnlySelected = false },
+                    label = { Text("All (${installedApps.size})", fontSize = 11.sp) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = accentColor.copy(alpha = 0.2f),
+                        selectedLabelColor = accentColor,
+                        containerColor = SurfaceDark,
+                        labelColor = TextSecondary
+                    )
+                )
+
+                FilterChip(
+                    selected = showOnlySelected,
+                    onClick = { showOnlySelected = true },
+                    label = { Text("Already Chosen ($validSelectedCount)", fontSize = 11.sp) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = accentColor.copy(alpha = 0.2f),
+                        selectedLabelColor = accentColor,
+                        containerColor = SurfaceDark,
+                        labelColor = TextSecondary
+                    )
+                )
+            }
+
+            Text(
+                text = if (maxSelection != null) "Selected $validSelectedCount / $maxSelection (Free Plan)" else "Selected $validSelectedCount apps",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = if (maxSelection != null && validSelectedCount >= maxSelection) WarningAmber else accentColor,
+                    fontWeight = FontWeight.SemiBold
+                )
             )
-        )
+        }
 
         Spacer(modifier = Modifier.height(6.dp))
 
@@ -360,7 +422,11 @@ fun InstalledAppSelectionStep(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No apps found matching \"$searchQuery\"",
+                    text = if (showOnlySelected && validSelectedCount == 0) {
+                        "No apps have been chosen yet."
+                    } else {
+                        "No apps found matching \"$searchQuery\""
+                    },
                     color = TextMuted,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -374,10 +440,31 @@ fun InstalledAppSelectionStep(
             ) {
                 items(filteredApps, key = { it.packageName }) { app ->
                     val isChecked = selectedPackages.contains(app.packageName)
+                    val isExcluded = excludedPackages.contains(app.packageName)
                     Card(
-                        onClick = { onToggle(app.packageName) },
+                        onClick = {
+                            if (!isExcluded) {
+                                if (isChecked) {
+                                    onToggle(app.packageName)
+                                } else {
+                                    if (maxSelection != null && validSelectedCount >= maxSelection) {
+                                        Toast.makeText(
+                                            context,
+                                            "Free plan allows up to $maxSelection apps per category. Upgrade to PRO for unlimited apps.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        onToggle(app.packageName)
+                                    }
+                                }
+                            }
+                        },
                         colors = CardDefaults.cardColors(
-                            containerColor = if (isChecked) SurfaceDark else SurfaceDark.copy(alpha = 0.4f)
+                            containerColor = when {
+                                isExcluded -> SurfaceDark.copy(alpha = 0.3f)
+                                isChecked -> SurfaceDark
+                                else -> SurfaceDark.copy(alpha = 0.5f)
+                            }
                         ),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -397,15 +484,15 @@ fun InstalledAppSelectionStep(
                                     text = app.name,
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = FontWeight.SemiBold,
-                                        color = TextPrimary
+                                        color = if (isExcluded) TextMuted else TextPrimary
                                     ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
-                                    text = app.packageName,
+                                    text = if (isExcluded) excludedLabel else app.packageName,
                                     style = MaterialTheme.typography.bodySmall.copy(
-                                        color = TextMuted,
+                                        color = if (isExcluded) WarningAmber else TextMuted,
                                         fontSize = 11.sp
                                     ),
                                     maxLines = 1,
@@ -413,14 +500,23 @@ fun InstalledAppSelectionStep(
                                 )
                             }
 
-                            Checkbox(
-                                checked = isChecked,
-                                onCheckedChange = { onToggle(app.packageName) },
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = accentColor,
-                                    checkmarkColor = Color.White
+                            if (isExcluded) {
+                                Icon(
+                                    imageVector = Icons.Default.Lock,
+                                    contentDescription = "Excluded",
+                                    tint = TextMuted,
+                                    modifier = Modifier.size(20.dp)
                                 )
-                            )
+                            } else {
+                                Checkbox(
+                                    checked = isChecked,
+                                    onCheckedChange = { onToggle(app.packageName) },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = accentColor,
+                                        checkmarkColor = Color.White
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -437,7 +533,8 @@ fun EmergencyPasswordStep(
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val length = password.trim().length
-    val isValid = length >= MIN_PASSWORD_LENGTH
+    val validation = remember(password) { RuleEngine.validateEmergencyPassphrase(password) }
+    val isValid = validation.isValid
 
     val statusColor = when {
         isValid -> SuccessGreen
@@ -471,7 +568,7 @@ fun EmergencyPasswordStep(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Create a long emergency passphrase (at least 35 symbols). If you truly need urgent access when an app is blocked, typing this entire phrase will unblock it.",
+            text = "Create a long emergency passphrase (at least 35 symbols). If you truly need urgent access when an app is blocked, typing this entire phrase will unblock it. Avoid repeating duplicate symbols.",
             style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
         )
 
@@ -515,12 +612,14 @@ fun EmergencyPasswordStep(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (isValid) "✓ Passphrase length met ($length chars)" else "Requires ${MIN_PASSWORD_LENGTH - length} more chars",
+                text = if (isValid) "✓ Passphrase valid" else (validation.error ?: "Requires ${MIN_PASSWORD_LENGTH - length} more chars"),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = statusColor,
                     fontWeight = FontWeight.SemiBold
-                )
+                ),
+                modifier = Modifier.weight(1f)
             )
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "$length / $MIN_PASSWORD_LENGTH",
                 style = MaterialTheme.typography.bodySmall.copy(
