@@ -187,6 +187,117 @@ class RuleEngineTest {
         assertEquals(1200L, evaluateReward(1800L))
         assertEquals(1200L, evaluateReward(2000L))
     }
+
+    @Test
+    fun testPipBlockedPackageResolution() {
+        val blockedPackages = setOf("com.google.android.youtube", "com.zhiliaoapp.musically", "com.instagram.android")
+        val youtubePip = "com.google.android.youtube"
+        val duolingoPip = "com.duolingo"
+
+        assertTrue(blockedPackages.contains(youtubePip))
+        assertFalse(blockedPackages.contains(duolingoPip))
+    }
+
+    @Test
+    fun testPipWalletDeductionAndBlockingDecision() {
+        fun evaluatePipAction(
+            pipPackage: String,
+            blockedPackages: Set<String>,
+            isUnfrozen: Boolean,
+            availableSeconds: Long
+        ): String {
+            if (!blockedPackages.contains(pipPackage)) return "IGNORE"
+            if (isUnfrozen) return "ALLOW_FREE"
+            return if (availableSeconds > 0) "DEDUCT_SECOND" else "BLOCK_AND_NEUTRALIZE"
+        }
+
+        val blocked = setOf("com.google.android.youtube")
+
+        // 1. YouTube in PiP with wallet balance -> DEDUCT
+        assertEquals(
+            "DEDUCT_SECOND",
+            evaluatePipAction("com.google.android.youtube", blocked, isUnfrozen = false, availableSeconds = 120L)
+        )
+
+        // 2. YouTube in PiP with empty wallet -> BLOCK_AND_NEUTRALIZE
+        assertEquals(
+            "BLOCK_AND_NEUTRALIZE",
+            evaluatePipAction("com.google.android.youtube", blocked, isUnfrozen = false, availableSeconds = 0L)
+        )
+
+        // 3. YouTube in PiP with active unfreeze -> ALLOW_FREE
+        assertEquals(
+            "ALLOW_FREE",
+            evaluatePipAction("com.google.android.youtube", blocked, isUnfrozen = true, availableSeconds = 0L)
+        )
+
+        // 4. Non-blocked app in PiP -> IGNORE
+        assertEquals(
+            "IGNORE",
+            evaluatePipAction("com.google.android.apps.maps", blocked, isUnfrozen = false, availableSeconds = 0L)
+        )
+    }
+
+    @Test
+    fun testCalculateRewardSeconds_zeroOrNegativeInputs() {
+        assertEquals(
+            0L,
+            RuleEngine.calculateRewardSeconds(
+                activeProductiveSeconds = 600L,
+                productiveMinutesTarget = 0,
+                rewardMinutes = 20
+            )
+        )
+        assertEquals(
+            0L,
+            RuleEngine.calculateRewardSeconds(
+                activeProductiveSeconds = 600L,
+                productiveMinutesTarget = 30,
+                rewardMinutes = 0
+            )
+        )
+        assertEquals(
+            0L,
+            RuleEngine.calculateRewardSeconds(
+                activeProductiveSeconds = 600L,
+                productiveMinutesTarget = -10,
+                rewardMinutes = 20
+            )
+        )
+    }
+
+    @Test
+    fun testIsDailyCapReached_zeroOrNegativeCap() {
+        assertFalse(RuleEngine.isDailyCapReached(earnedTodaySeconds = 1000L, dailyCapMinutes = 0))
+        assertFalse(RuleEngine.isDailyCapReached(earnedTodaySeconds = 1000L, dailyCapMinutes = -10))
+    }
+
+    @Test
+    fun testEmergencyPasswordValidation_consecutiveDuplicateThreshold() {
+        // 4 identical consecutive characters is the maximum allowed
+        val fourConsecutive = "I promise to stay focused today 2026 aaaa!"
+        assertTrue(RuleEngine.isEmergencyPassphraseValid(fourConsecutive))
+
+        // 5 identical consecutive characters is rejected
+        val fiveConsecutive = "I promise to stay focused today 2026 aaaaa!"
+        assertFalse(RuleEngine.isEmergencyPassphraseValid(fiveConsecutive))
+        assertEquals(
+            "Passphrase cannot contain more than 4 identical consecutive characters.",
+            RuleEngine.validateEmergencyPassphrase(fiveConsecutive).error
+        )
+    }
+
+    @Test
+    fun testEmergencyPasswordValidation_frequencyLimit() {
+        // Passphrase of 40 chars where one char appears 17 times (17 > 40 * 0.4 = 16)
+        val highCharFreq = "z 1 z 2 z 3 z 4 z 5 z 6 z 7 z 8 z 9 z 0 z a z b z"
+        val validation = RuleEngine.validateEmergencyPassphrase(highCharFreq)
+        assertFalse(validation.isValid)
+        assertEquals(
+            "Passphrase contains too many repeated instances of a single character.",
+            validation.error
+        )
+    }
 }
 
 

@@ -31,6 +31,7 @@ import com.arhiplabs.unstuckly.UnstucklyApplication
 import com.arhiplabs.unstuckly.data.model.Rule
 import com.arhiplabs.unstuckly.data.model.Wallet
 import com.arhiplabs.unstuckly.service.AppTrackingForegroundService
+import com.arhiplabs.unstuckly.ui.components.AppLogo
 import com.arhiplabs.unstuckly.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -99,18 +100,26 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.app_name),
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AppLogo(
+                        modifier = Modifier.height(46.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.app_name),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         )
-                    )
-                    Text(
-                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.tagline),
-                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    )
+                        Text(
+                            text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.tagline),
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        )
+                    }
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {

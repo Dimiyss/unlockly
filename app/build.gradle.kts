@@ -9,16 +9,35 @@ android {
     namespace = "com.arhiplabs.unstuckly"
     compileSdk = 34
 
+    val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()
+
     defaultConfig {
         applicationId = "com.arhiplabs.unstuckly"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0-mvp"
+        versionCode = runNumber ?: 1
+        versionName = runNumber?.let { "1.0.$it" } ?: "1.0.0-mvp"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    val keystoreFile = project.rootProject.file("app/release.keystore")
+    val hasReleaseKeystore = keystoreFile.exists() &&
+        !System.getenv("KEYSTORE_PASSWORD").isNullOrEmpty() &&
+        !System.getenv("KEY_ALIAS").isNullOrEmpty() &&
+        !System.getenv("KEY_PASSWORD").isNullOrEmpty()
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = keystoreFile
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
         }
     }
 
@@ -29,6 +48,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {

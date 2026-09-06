@@ -142,10 +142,14 @@ class BlockingOverlayManager(private val context: Context) {
             else
                 @Suppress("DEPRECATION") WindowManager.LayoutParams.TYPE_PHONE,
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    @Suppress("DEPRECATION") WindowManager.LayoutParams.FLAG_FULLSCREEN,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.CENTER
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                flags = flags or WindowManager.LayoutParams.FLAG_BLUR_BEHIND
+                blurBehindRadius = 50
+            }
         }
 
         return try {
@@ -211,7 +215,7 @@ fun OverlayContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(if (isDark) Color(0xF00F172A) else Color(0x99000000))
+            .background(if (isDark) Color(0xF00F172A) else Color(0xD9FFFFFF))
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
@@ -343,7 +347,7 @@ fun OverlayContent(
                             .padding(top = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Divider(
+                        HorizontalDivider(
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                             modifier = Modifier.padding(bottom = 12.dp)
                         )

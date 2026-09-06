@@ -8,7 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,7 +28,8 @@ fun HealthScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val healthMonitor = remember { UnstucklyApplication.instance.healthMonitor }
+    val app = remember { UnstucklyApplication.instance }
+    val healthMonitor = remember { app.healthMonitor }
     var healthStatus by remember { mutableStateOf(healthMonitor.checkHealth()) }
 
     Scaffold(
@@ -45,7 +46,7 @@ fun HealthScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.onBackground
                         )

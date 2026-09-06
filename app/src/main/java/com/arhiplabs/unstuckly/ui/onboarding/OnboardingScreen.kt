@@ -21,6 +21,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -37,6 +38,7 @@ import com.arhiplabs.unstuckly.data.model.InstalledApp
 import com.arhiplabs.unstuckly.data.model.InstalledAppHelper
 import com.arhiplabs.unstuckly.data.model.Rule
 import com.arhiplabs.unstuckly.ui.components.AppIconImage
+import com.arhiplabs.unstuckly.ui.components.AppLogo
 import com.arhiplabs.unstuckly.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -234,19 +236,9 @@ fun WelcomeStep() {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .background(PrimaryIndigo.copy(alpha = 0.15f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.HourglassTop,
-                contentDescription = null,
-                tint = PrimaryIndigo,
-                modifier = Modifier.size(54.dp)
-            )
-        }
+        AppLogo(
+            modifier = Modifier.height(180.dp)
+        )
 
         Spacer(modifier = Modifier.height(28.dp))
 

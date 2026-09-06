@@ -57,6 +57,18 @@ fun PreferencesDialog(
                     .padding(24.dp)
                     .verticalScroll(rememberScrollState())
             ) {
+                // Brand Logo Preview
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AppLogo(
+                        modifier = Modifier.height(84.dp)
+                    )
+                }
+
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),

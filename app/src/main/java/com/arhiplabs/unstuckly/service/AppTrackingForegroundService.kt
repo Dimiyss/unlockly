@@ -49,6 +49,12 @@ class AppTrackingForegroundService : Service() {
                         app.earnSessionManager.tick(currentPkg, isInteractive)
                         app.blockingCoordinator.evaluateForegroundPackage(currentPkg)
                     }
+
+                    // Check for blocked apps playing in Picture-in-Picture (PiP)
+                    val pipPkg = InteractionTrackerService.instance?.detectPipPackage()
+                    if (!pipPkg.isNullOrEmpty()) {
+                        app.blockingCoordinator.evaluatePipPackage(pipPkg)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
