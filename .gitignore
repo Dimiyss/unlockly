@@ -10,5 +10,7 @@ app/build/
 .gradle
 .idea
 .idea/
+*.keystore
+*.jks
 
 
