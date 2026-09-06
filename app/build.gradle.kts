@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.arhiplabs.unstuckly"
-    compileSdk = 34
+    compileSdk = 36
 
     val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()
 
     defaultConfig {
         applicationId = "com.arhiplabs.unstuckly"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 36
         versionCode = runNumber ?: 1
         versionName = runNumber?.let { "1.0.$it" } ?: "1.0.0-mvp"
 
