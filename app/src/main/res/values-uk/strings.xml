@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Unstuckly</string>
+    <string name="accessibility_service_description">Unstuckly використовує Спеціальні можливості для фіксації активності під час продуктивного навчання та контролю лімітів соцмереж.</string>
+    <string name="tagline">Заробляй екранний час</string>
+
+    <!-- Theme & Preferences -->
+    <string name="preferences_title">Налаштування</string>
+    <string name="appearance_title">Тема оформлення</string>
+    <string name="theme_system">Системна за замовчуванням</string>
+    <string name="theme_light">Світла тема</string>
+    <string name="theme_dark">Темна тема</string>
+    <string name="language_title">Мова</string>
+    <string name="language_system">Системна за замовчуванням</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch (DE)</string>
+    <string name="language_uk">Українська (UA)</string>
+    <string name="language_es">Español (ESP)</string>
+    <string name="language_pt">Português (POR)</string>
+    <string name="close">Закрити</string>
+
+    <!-- Home Screen -->
+    <string name="social_wallet">Соціальний гаманець</string>
+    <string name="available_balance">Доступний баланс</string>
+    <string name="minutes_unit">хв</string>
+    <string name="daily_cap">Денний ліміт</string>
+    <string name="expires_at_midnight">Скидається опівночі</string>
+    <string name="today_activity">Сьогоднішня активність</string>
+    <string name="productive_earned">Зароблено навчанням</string>
+    <string name="social_consumed">Витрачено у соцмережах</string>
+    <string name="quick_actions">Швидкі дії</string>
+    <string name="start_study">Почати навчання</string>
+    <string name="open_social">Відкрити соцмережу</string>
+    <string name="active_rules">Активне правило</string>
+    <string name="no_active_rules">Немає налаштованого правила</string>
+    <string name="exchange_rate">Курс обміну</string>
+    <string name="emergency_override">Екстрене розблокування</string>
+    <string name="emergency_desc">Введіть парольну фразу (від 35 символів), щоб тимчасово розблокувати додатки без зароблених токенів.</string>
+    <string name="enter_passphrase">Введіть фразу…</string>
+    <string name="submit_passphrase">Розблокувати доступ</string>
+    <string name="passphrase_too_short">Фраза має містити щонайменше 35 символів</string>
+    <string name="passphrase_invalid">Невірна парольна фраза</string>
+    <string name="emergency_success">Екстрений доступ надано на 15 хвилин</string>
+
+    <!-- Internal Home Screen Blocks (Ukrainian) -->
+    <string name="live_status_idle">Корисний додаток зараз не активний</string>
+    <string name="live_status_active">Заробіток часу в %1$s</string>
+    <string name="live_status_paused">У навчальному додатку (на паузі - взаємодійте)</string>
+    <string name="live_status_unfrozen">❄️ Розморожування активне (правила вимкнено)</string>
+    <string name="live_status_boost_earning">🔥 Заробіток з прискоренням %1$sx у %2$s</string>
+    <string name="live_status_boost_idle">🔥 Буст %1$sx активний (навчайтесь для подвоєння)</string>
+
+    <string name="wallet_balance_title">Баланс соціального гаманця</string>
+    <string name="wallet_status_empty">Гаманець порожній — вчіться для розблокування</string>
+    <string name="wallet_status_unlocked">Соцмережі розблоковано</string>
+    <string name="wallet_status_unfrozen">❄️ Пароль розмороження активний</string>
+
+    <string name="initial_study_target_title">Початкова ціль навчання</string>
+    <string name="initial_study_target_desc">Мінімум навчання перед відкриттям соцмереж</string>
+    <string name="initial_study_target_met">Ціль виконано • пройдено %1$s сьогодні</string>
+    <string name="target_unlocked_badge">✅ Розблоковано</string>
+    <string name="target_locked_badge">🔒 Заблоковано</string>
+    <string name="target_required">Потрібно %1$s з %2$s хв</string>
+    <string name="target_reward_allowance">Винагорода: +%1$s хв доступу</string>
+    <string name="target_reward_credited">+%1$s хв винагороди нараховано</string>
+
+    <string name="metric_studied">Навчання</string>
+    <string name="metric_earned">Зароблено</string>
+    <string name="metric_spent">Витрачено</string>
+
+    <string name="store_promo_title">Магазин та Бустери</string>
+    <string name="store_promo_desc">2.0x Мега Бусти, Розморозка та PRO</string>
+    <string name="btn_buy">Купити</string>
+
+    <string name="active_rules_title">Активні правила та ліміти</string>
+    <string name="rule_exchange_rate">Курс обміну</string>
+    <string name="rule_daily_cap">Денний ліміт</string>
+    <string name="rule_productive_apps">Корисні додатки</string>
+    <string name="rule_blocked_apps">Заблоковані додатки</string>
+    <string name="rule_apps_configured">Налаштовано додатків: %1$d</string>
+    <string name="rule_apps_shielded">Заблоковано додатків: %1$d</string>
+    <string name="rule_rate_format">%1$d хв навчання ➔ %2$d хв соцмереж</string>
+    <string name="rule_cap_format">Максимум %1$d хв / день</string>
+
+    <string name="emergency_unlock_title">Екстрене розблокування</string>
+    <string name="emergency_unlock_subtitle">Розблокувати через 35+ символьну фразу (1р / день)</string>
+    <string name="emergency_unlock_used">Використано сьогодні (скидання опівночі)</string>
+
+    <!-- Rule Editor -->
+    <string name="rule_editor_title">Редагувати правило</string>
+    <string name="productive_apps">Корисні додатки (Заробіток)</string>
+    <string name="distracting_apps">Соцмережі (Блокування)</string>
+    <string name="ratio_label">1 хв навчання = %1$s хв соцмереж</string>
+    <string name="save_rule">Зберегти зміни</string>
+    <string name="rule_saved">Правило успішно збережено</string>
+    <string name="emergency_passphrase_title">Екстрена фраза (мін. 35 символів)</string>
+    <string name="passphrase_helper">Введення довгої фрази створює усвідомлений бар’єр перед відволіканням.</string>
+
+    <!-- Health Diagnostics -->
+    <string name="health_title">Стан системи</string>
+    <string name="diagnostics_title">Діагностика системи</string>
+    <string name="diagnostics_subtitle">Переконайтеся, що всі фонові служби та дозволи активні для надійного блокування.</string>
+    <string name="usage_access_title">Доступ до використання</string>
+    <string name="usage_access_desc">Визначає, коли запускаються корисні чи відволікаючі додатки.</string>
+    <string name="accessibility_title">Спеціальні можливості</string>
+    <string name="accessibility_desc">Відстежує взаємодію з екраном та зміну вікон.</string>
+    <string name="overlay_title">Відображення поверх інших</string>
+    <string name="overlay_desc">Показує екран блокування при вичерпанні балансу.</string>
+    <string name="battery_title">Оптимізація батареї</string>
+    <string name="battery_desc">Запобігає зупинці служб системою Android у фоні.</string>
+    <string name="recheck_health">Повторна перевірка</string>
+    <string name="grant_permission">Надати</string>
+    <string name="granted">Надано</string>
+
+    <!-- Store Screen -->
+    <string name="store_title">Unstuckly PRO</string>
+    <string name="pro_member">Ви PRO-користувач!</string>
+    <string name="unlock_pro">Отримати PRO</string>
+    <string name="restore_purchases">Відновити покупки</string>
+    <string name="monthly_plan">Щомісячно</string>
+    <string name="annual_plan">Річна підписка (знижка 40%)</string>
+    <string name="lifetime_plan">Довічний доступ</string>
+
+    <!-- Blocker Overlay -->
+    <string name="blocker_title">Час вичерпано!</string>
+    <string name="blocker_subtitle">Ваш соціальний гаманець порожній. Заробіть час навчанням або введіть 35+ символьну фразу в Unstuckly.</string>
+    <string name="open_unstuckly">Відкрити Unstuckly</string>
+    <string name="blocker_study_target_required">Потрібно завершити навчальну мету</string>
+    <string name="blocker_time_limit_reached">Ліміт часу вичерпано</string>
+    <string name="blocker_initial_target_desc">Сьогодні ви маєте завершити початкові %1$s хв навчання перед доступом до заблокованих додатків.</string>
+    <string name="blocker_progress_format">Прогрес: %1$d / %2$d хв (%3$d%%)</string>
+    <string name="blocker_wallet_empty_desc">Ваш соціальний гаманець порожній. Проводьте час у корисних додатках, щоб заробити доступ, або скористайтеся екстреною фразою за нагальної потреби.</string>
+    <string name="blocker_earn_time_button">Заробити час в Unstuckly</string>
+    <string name="blocker_emergency_unlock_btn">Екстрене розблокування (Пароль)</string>
+    <string name="blocker_cancel_emergency_btn">Скасувати екстрене розблокування</string>
+    <string name="blocker_emergency_prompt">Введіть екстрену парольну фразу (від 35 символів):</string>
+    <string name="blocker_emergency_placeholder">Введіть екстрену фразу...</string>
+    <string name="blocker_length_format">Довжина: %1$d / %2$d</string>
+    <string name="blocker_confirm_emergency_btn">Підтвердити розблокування</string>
+    <string name="blocker_incorrect_passphrase">Неправильна екстрена фраза. Спробуйте ще раз.</string>
+    <string name="blocker_invalid_passphrase">Недійсна екстрена фраза.</string>
+    <string name="blocker_emergency_granted_toast">Екстрений доступ надано (15 хв)</string>
+
+    <!-- Health / Permissions Screen -->
+    <string name="permission_health_title">Стан дозволів</string>
+    <string name="system_diagnostics_title">Діагностика системи</string>
+    <string name="system_diagnostics_desc">Переконайтеся, що всі необхідні фонові служби та дозволи надані для стабільної роботи.</string>
+    <string name="perm_usage_access_title">Доступ до використання</string>
+    <string name="perm_usage_access_desc">Визначає запуск корисних або відволікаючих додатків.</string>
+    <string name="perm_accessibility_title">Служба доступності</string>
+    <string name="perm_accessibility_desc">Фіксує активні натискання, скролінг та зміну вікон.</string>
+    <string name="perm_overlay_title">Відображення поверх інших додатків</string>
+    <string name="perm_overlay_desc">Показує екран блокування, коли ліміт соціального часу вичерпано.</string>
+    <string name="perm_battery_title">Вимкнути оптимізацію батареї</string>
+    <string name="perm_battery_desc">Запобігає зупинці фонової служби системою Android.</string>
+    <string name="btn_grant">Надати</string>
+    <string name="btn_granted">Надано</string>
+    <string name="btn_recheck_health">Перевірити стан системи</string>
+</resources>

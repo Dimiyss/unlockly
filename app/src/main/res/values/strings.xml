@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Unstuckly</string>
+    <string name="accessibility_service_description">Unstuckly uses Accessibility Service to track active engagement during productive app study sessions and enforce social app limits.</string>
+    <string name="tagline">Earn Social Time</string>
+
+    <!-- Theme & Preferences -->
+    <string name="preferences_title">Preferences</string>
+    <string name="appearance_title">Appearance</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_light">Light Theme</string>
+    <string name="theme_dark">Dark Theme</string>
+    <string name="language_title">Language</string>
+    <string name="language_system">System Default</string>
+    <string name="language_en">English</string>
+    <string name="language_de">Deutsch (DE)</string>
+    <string name="language_uk">Українська (UA)</string>
+    <string name="language_es">Español (ESP)</string>
+    <string name="language_pt">Português (POR)</string>
+    <string name="close">Close</string>
+
+    <!-- Home Screen -->
+    <string name="social_wallet">Social Wallet</string>
+    <string name="available_balance">Available Balance</string>
+    <string name="minutes_unit">min</string>
+    <string name="daily_cap">Daily Cap</string>
+    <string name="expires_at_midnight">Resets at midnight</string>
+    <string name="today_activity">Today\'s Activity</string>
+    <string name="productive_earned">Productive Earned</string>
+    <string name="social_consumed">Social Consumed</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="start_study">Start Studying</string>
+    <string name="open_social">Open Social App</string>
+    <string name="active_rules">Active Rule</string>
+    <string name="no_active_rules">No active rule configured</string>
+    <string name="exchange_rate">Exchange Rate</string>
+    <string name="emergency_override">Emergency Override</string>
+    <string name="emergency_desc">Enter your 35+ symbol passphrase to unlock social apps without earning tokens.</string>
+    <string name="enter_passphrase">Enter passphrase…</string>
+    <string name="submit_passphrase">Unlock Emergency Access</string>
+    <string name="passphrase_too_short">Passphrase must be at least 35 characters</string>
+    <string name="passphrase_invalid">Incorrect passphrase</string>
+    <string name="emergency_success">Emergency access granted for 15 minutes</string>
+
+    <!-- Internal Home Screen Blocks -->
+    <string name="live_status_idle">No productive app currently active</string>
+    <string name="live_status_active">Actively earning in %1$s</string>
+    <string name="live_status_paused">In study app (paused - interact to accrue)</string>
+    <string name="live_status_unfrozen">❄️ Unfreeze active (Bypassing blocking rules)</string>
+    <string name="live_status_boost_earning">🔥 Earning with %1$sx Boost in %2$s</string>
+    <string name="live_status_boost_idle">🔥 %1$sx Boost active (Study to double earnings)</string>
+
+    <string name="wallet_balance_title">Social Wallet Balance</string>
+    <string name="wallet_status_empty">Wallet empty - study to unlock</string>
+    <string name="wallet_status_unlocked">Social apps unlocked</string>
+    <string name="wallet_status_unfrozen">❄️ Unfreeze pass active — apps unblocked</string>
+
+    <string name="initial_study_target_title">Initial Study Target</string>
+    <string name="initial_study_target_desc">Minimum requirement before social apps unlock</string>
+    <string name="initial_study_target_met">Target met • %1$s studied today</string>
+    <string name="target_unlocked_badge">✅ Unlocked</string>
+    <string name="target_locked_badge">🔒 Locked</string>
+    <string name="target_required">%1$s / %2$sm required</string>
+    <string name="target_reward_allowance">Reward: +%1$sm allowance</string>
+    <string name="target_reward_credited">+%1$sm reward credited</string>
+
+    <string name="metric_studied">Studied</string>
+    <string name="metric_earned">Earned</string>
+    <string name="metric_spent">Spent</string>
+
+    <string name="store_promo_title">Store &amp; Power-Ups</string>
+    <string name="store_promo_desc">2.0x Mega Boosts, Unfreeze Passes &amp; PRO</string>
+    <string name="btn_buy">Buy</string>
+
+    <string name="active_rules_title">Active Rule &amp; Limits</string>
+    <string name="rule_exchange_rate">Exchange Rate</string>
+    <string name="rule_daily_cap">Daily Cap</string>
+    <string name="rule_productive_apps">Productive Apps</string>
+    <string name="rule_blocked_apps">Blocked Apps</string>
+    <string name="rule_apps_configured">%1$d apps configured</string>
+    <string name="rule_apps_shielded">%1$d apps shielded</string>
+    <string name="rule_rate_format">%1$dm study ➔ %2$dm social</string>
+    <string name="rule_cap_format">%1$d minutes max / day</string>
+
+    <string name="emergency_unlock_title">Emergency Unlock</string>
+    <string name="emergency_unlock_subtitle">Override shields with 35+ symbol passphrase (1x / day)</string>
+    <string name="emergency_unlock_used">Used today (resets at midnight)</string>
+
+    <!-- Rule Editor -->
+    <string name="rule_editor_title">Edit Rule</string>
+    <string name="productive_apps">Productive Apps (Earn)</string>
+    <string name="distracting_apps">Social Apps (Shielded)</string>
+    <string name="ratio_label">1 min study = %1$s min social</string>
+    <string name="save_rule">Save Changes</string>
+    <string name="rule_saved">Rule saved successfully</string>
+    <string name="emergency_passphrase_title">Emergency Passphrase (Min 35 chars)</string>
+    <string name="passphrase_helper">Typing a long phrase creates intentional friction before unblocking.</string>
+
+    <!-- Health Diagnostics -->
+    <string name="health_title">System Health</string>
+    <string name="diagnostics_title">System Diagnostics</string>
+    <string name="diagnostics_subtitle">Ensure all required background services and permissions are granted for reliable enforcement.</string>
+    <string name="usage_access_title">Usage Access</string>
+    <string name="usage_access_desc">Used to detect when productive or distracting apps are opened.</string>
+    <string name="accessibility_title">Accessibility Service</string>
+    <string name="accessibility_desc">Measures active screen touches/scrolls and window changes.</string>
+    <string name="overlay_title">Draw Over Other Apps</string>
+    <string name="overlay_desc">Displays full-screen blocker when social wallet is exhausted.</string>
+    <string name="battery_title">Disable Battery Optimization</string>
+    <string name="battery_desc">Prevents Android OS from killing tracking service in background.</string>
+    <string name="recheck_health">Re-check System Health</string>
+    <string name="grant_permission">Grant</string>
+    <string name="granted">Granted</string>
+
+    <!-- Store Screen -->
+    <string name="store_title">Unstuckly PRO</string>
+    <string name="pro_member">You Are a PRO Member!</string>
+    <string name="unlock_pro">Upgrade to PRO</string>
+    <string name="restore_purchases">Restore Purchases</string>
+    <string name="monthly_plan">Monthly</string>
+    <string name="annual_plan">Annual (Save 40%)</string>
+    <string name="lifetime_plan">Lifetime Access</string>
+
+    <!-- Blocker Overlay -->
+    <string name="blocker_title">Time\'s Up!</string>
+    <string name="blocker_subtitle">Your social wallet is empty. Earn time by studying, or enter your 35+ symbol passphrase in Unstuckly.</string>
+    <string name="open_unstuckly">Open Unstuckly</string>
+    <string name="blocker_study_target_required">Study Target Required</string>
+    <string name="blocker_time_limit_reached">Time Limit Reached</string>
+    <string name="blocker_initial_target_desc">You must complete your initial %1$sm study session today before accessing blocked apps.</string>
+    <string name="blocker_progress_format">Progress: %1$d / %2$d min (%3$d%%)</string>
+    <string name="blocker_wallet_empty_desc">Your social wallet is empty. Spend productive time in study apps to earn more access time, or use your emergency passphrase if urgently needed.</string>
+    <string name="blocker_earn_time_button">Earn Time in Unstuckly</string>
+    <string name="blocker_emergency_unlock_btn">Emergency Unlock (Passphrase)</string>
+    <string name="blocker_cancel_emergency_btn">Cancel Emergency Unlock</string>
+    <string name="blocker_emergency_prompt">Enter your 35+ character emergency passphrase:</string>
+    <string name="blocker_emergency_placeholder">Type emergency passphrase...</string>
+    <string name="blocker_length_format">Length: %1$d / %2$d</string>
+    <string name="blocker_confirm_emergency_btn">Confirm Emergency Unlock</string>
+    <string name="blocker_incorrect_passphrase">Incorrect emergency passphrase. Try again.</string>
+    <string name="blocker_invalid_passphrase">Invalid emergency passphrase.</string>
+    <string name="blocker_emergency_granted_toast">Emergency access granted (15 min)</string>
+
+    <!-- Health / Permissions Screen -->
+    <string name="permission_health_title">Permission Health</string>
+    <string name="system_diagnostics_title">System Diagnostics</string>
+    <string name="system_diagnostics_desc">Ensure all required background services and permissions are granted for reliable enforcement.</string>
+    <string name="perm_usage_access_title">Usage Access</string>
+    <string name="perm_usage_access_desc">Used to detect when productive or distracting apps are opened.</string>
+    <string name="perm_accessibility_title">Accessibility Service</string>
+    <string name="perm_accessibility_desc">Measures active screen touches/scrolls and window changes.</string>
+    <string name="perm_overlay_title">Draw Over Other Apps</string>
+    <string name="perm_overlay_desc">Displays full-screen blocker when social wallet is exhausted.</string>
+    <string name="perm_battery_title">Disable Battery Optimization</string>
+    <string name="perm_battery_desc">Prevents Android OS from killing tracking service in background.</string>
+    <string name="btn_grant">Grant</string>
+    <string name="btn_granted">Granted</string>
+    <string name="btn_recheck_health">Re-check System Health</string>
+</resources>
