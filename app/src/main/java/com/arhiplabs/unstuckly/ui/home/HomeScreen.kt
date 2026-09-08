@@ -984,5 +984,11 @@ fun formatSeconds(totalSeconds: Long): String {
 
 fun formatSecondsShort(totalSeconds: Long): String {
     val minutes = totalSeconds / 60
-    return "${minutes}m"
+    val seconds = totalSeconds % 60
+    return when {
+        totalSeconds <= 0L -> "0m"
+        totalSeconds < 60L -> "${seconds}s"
+        seconds == 0L -> "${minutes}m"
+        else -> "${minutes}m ${seconds}s"
+    }
 }

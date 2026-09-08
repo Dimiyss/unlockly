@@ -298,6 +298,33 @@ class RuleEngineTest {
             validation.error
         )
     }
+
+    @Test
+    fun testIsIgnoredPackage_systemAndKeyboardsFiltered() {
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.android.systemui"))
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("android"))
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.samsung.android.honeyboard"))
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.google.android.inputmethod.latin"))
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.arhiplabs.unstuckly"))
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage(""))
+        assertTrue(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage(null))
+
+        // Target and blocked user apps should NOT be ignored
+        assertFalse(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.moymer.falou"))
+        assertFalse(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.quizlet.quizlet"))
+        assertFalse(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.duolingo"))
+        assertFalse(com.arhiplabs.unstuckly.service.InteractionTrackerService.isIgnoredPackage("com.instagram.android"))
+    }
+
+    @Test
+    fun testFormatSecondsShort_adaptiveDisplay() {
+        assertEquals("0m", com.arhiplabs.unstuckly.ui.home.formatSecondsShort(0L))
+        assertEquals("38s", com.arhiplabs.unstuckly.ui.home.formatSecondsShort(38L))
+        assertEquals("58s", com.arhiplabs.unstuckly.ui.home.formatSecondsShort(58L))
+        assertEquals("1m", com.arhiplabs.unstuckly.ui.home.formatSecondsShort(60L))
+        assertEquals("1m 15s", com.arhiplabs.unstuckly.ui.home.formatSecondsShort(75L))
+        assertEquals("30m", com.arhiplabs.unstuckly.ui.home.formatSecondsShort(1800L))
+    }
 }
 
 
