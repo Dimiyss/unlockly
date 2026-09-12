@@ -96,64 +96,89 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
+                    modifier = Modifier.weight(1f, fill = false),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AppLogo(
-                        modifier = Modifier.height(46.dp)
+                        modifier = Modifier.height(42.dp)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.app_name),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground
-                            )
+                            ),
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
                             text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.tagline),
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
                     // Preferences (Theme & Language)
-                    IconButton(onClick = { showPreferencesDialog = true }) {
+                    IconButton(
+                        onClick = { showPreferencesDialog = true },
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.preferences_title),
-                            tint = PrimaryIndigo
+                            tint = PrimaryIndigo,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
                     // Store / PRO Button
-                    IconButton(onClick = onNavigateToStore) {
+                    IconButton(
+                        onClick = onNavigateToStore,
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.WorkspacePremium,
                             contentDescription = "Store & Power-Ups",
-                            tint = WarningAmber
+                            tint = WarningAmber,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    IconButton(onClick = onNavigateToHealth) {
+                    IconButton(
+                        onClick = onNavigateToHealth,
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = if (healthStatus.isFullyHealthy) Icons.Default.CheckCircle else Icons.Default.Warning,
                             contentDescription = "Health Status",
-                            tint = if (healthStatus.isFullyHealthy) SuccessGreen else WarningAmber
+                            tint = if (healthStatus.isFullyHealthy) SuccessGreen else WarningAmber,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    IconButton(onClick = handleEditRulesRequest) {
+                    IconButton(
+                        onClick = handleEditRulesRequest,
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit Rules",
-                            tint = PrimaryIndigo
+                            tint = PrimaryIndigo,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }

@@ -17,6 +17,7 @@
     <string name="language_uk">Українська (UA)</string>
     <string name="language_es">Español (ESP)</string>
     <string name="language_pt">Português (POR)</string>
+    <string name="language_ru">Русский (RU)</string>
     <string name="close">Закрити</string>
 
     <!-- Home Screen -->
@@ -156,4 +157,53 @@
     <string name="btn_grant">Надати</string>
     <string name="btn_granted">Надано</string>
     <string name="btn_recheck_health">Перевірити стан системи</string>
+
+    <!-- Onboarding Navigation & Common -->
+    <string name="onboarding_back">Назад</string>
+    <string name="onboarding_continue">Продовжити</string>
+    <string name="onboarding_start">Почати Unlockly</string>
+
+    <!-- Onboarding Step 0: Language Selection -->
+    <string name="onboarding_language_title">Оберіть мову</string>
+    <string name="onboarding_language_subtitle">Виберіть бажану мову додатку для початку</string>
+
+    <!-- Onboarding Step 1: Welcome -->
+    <string name="onboarding_welcome_title">Заробляй екранний час</string>
+    <string name="onboarding_welcome_desc">Проводьте корисні хвилини у навчальних додатках, щоб заробляти час для розважальних. Перетворіть звичку на винагороду!</string>
+
+    <!-- Onboarding Steps 2 & 3: Apps Selection -->
+    <string name="onboarding_productive_title">Корисні додатки для навчання</string>
+    <string name="onboarding_productive_subtitle">Виберіть навчальні додатки, де активне використання зароблятиме вам час.</string>
+    <string name="onboarding_blocked_title">Обмежені / розважальні додатки</string>
+    <string name="onboarding_blocked_subtitle">Виберіть додатки, які витрачатимуть ваш баланс і блокуватимуться, коли він порожній.</string>
+    <string name="onboarding_search_apps_hint">Пошук встановлених додатків…</string>
+    <string name="onboarding_filter_all">Всі (%1$d)</string>
+    <string name="onboarding_filter_chosen">Вже обрано (%1$d)</string>
+    <string name="onboarding_selected_count_limit">Обрано %1$d / %2$d (Безкоштовно)</string>
+    <string name="onboarding_selected_count">Обрано додатків: %1$d</string>
+    <string name="onboarding_excluded_blocked">Вже обрано як заблокований додаток</string>
+    <string name="onboarding_excluded_productive">Вже обрано як навчальний додаток</string>
+    <string name="onboarding_excluded_default">Вже обрано в іншій категорії</string>
+    <string name="onboarding_empty_chosen">Жодного додатку ще не обрано.</string>
+    <string name="onboarding_empty_search">Не знайдено додатків за запитом \"%1$s\"</string>
+    <string name="onboarding_free_plan_limit_toast">Безкоштовний план дозволяє до %1$d додатків у кожній категорії. Перейдіть на PRO для безліміту.</string>
+
+    <!-- Onboarding Step 4: Emergency Passphrase -->
+    <string name="onboarding_emergency_title">Екстрена парольна фраза</string>
+    <string name="onboarding_emergency_subtitle">Створіть довгу парольну фразу (від 35 символів). Якщо вам терміново знадобиться доступ, введення цієї фрази розблокує додаток. Уникайте повторення однакових символів.</string>
+    <string name="onboarding_emergency_input_label">Екстрена фраза (мін. 35 символів)</string>
+    <string name="onboarding_emergency_input_placeholder">наприклад, Я обіцяю залишатися зосередженим на навчанні щодня 2026!</string>
+    <string name="onboarding_emergency_hide">Приховати фразу</string>
+    <string name="onboarding_emergency_show">Показати фразу</string>
+    <string name="onboarding_emergency_valid">✓ Парольна фраза валідна</string>
+    <string name="onboarding_emergency_chars_needed">Потрібно ще %1$d симв.</string>
+    <string name="onboarding_emergency_why_title">Чому 35+ символів?</string>
+    <string name="onboarding_emergency_why_desc">Довге речення створює усвідомлене тертя для подолання дофамінових петель, гарантуючи, що ви ніколи не будете заблоковані назавжди.</string>
+
+    <!-- Onboarding Step 5: Permissions & Battery Optimization -->
+    <string name="onboarding_perm_title">Необхідні дозволи</string>
+    <string name="onboarding_perm_subtitle">Unlockly потребує системних дозволів для фіксації навчання, контролю лімітів та фонової роботи.</string>
+    <string name="onboarding_perm_battery_mandatory_notice">Вимкнення оптимізації батареї обов\'язкове для безперервної роботи фонового трекера.</string>
+    <string name="onboarding_perm_battery_required_badge">Обов\'язково</string>
+    <string name="onboarding_perm_refresh">Оновити статус дозволів</string>
 </resources>

@@ -17,6 +17,7 @@
     <string name="language_uk">Українська (UA)</string>
     <string name="language_es">Español (ESP)</string>
     <string name="language_pt">Português (POR)</string>
+    <string name="language_ru">Русский (RU)</string>
     <string name="close">Schließen</string>
 
     <!-- Home Screen -->
@@ -156,4 +157,53 @@
     <string name="btn_grant">Erlauben</string>
     <string name="btn_granted">Erlaubt</string>
     <string name="btn_recheck_health">Systemzustand erneut prüfen</string>
+
+    <!-- Onboarding Navigation & Common -->
+    <string name="onboarding_back">Zurück</string>
+    <string name="onboarding_continue">Weiter</string>
+    <string name="onboarding_start">Unlockly starten</string>
+
+    <!-- Onboarding Step 0: Language Selection -->
+    <string name="onboarding_language_title">Sprache wählen</string>
+    <string name="onboarding_language_subtitle">Wähle deine bevorzugte Sprache für Unlockly</string>
+
+    <!-- Onboarding Step 1: Welcome -->
+    <string name="onboarding_welcome_title">Verdiene deine Bildschirmzeit</string>
+    <string name="onboarding_welcome_desc">Verbringe aktive Lernminuten in Bildungs-Apps, um Bildschirmzeit für soziale Apps zu verdienen. Mache Gewohnheiten zur Belohnung!</string>
+
+    <!-- Onboarding Steps 2 & 3: Apps Selection -->
+    <string name="onboarding_productive_title">Produktive Lern-Apps</string>
+    <string name="onboarding_productive_subtitle">Wähle Lern-Apps aus, deren aktive Nutzung dir Bildschirmzeit einbringt.</string>
+    <string name="onboarding_blocked_title">Gesperrte / Ablenkende Apps</string>
+    <string name="onboarding_blocked_subtitle">Wähle Apps, die dein Zeitguthaben verbrauchen und gesperrt werden, wenn es leer ist.</string>
+    <string name="onboarding_search_apps_hint">Installierte Apps durchsuchen…</string>
+    <string name="onboarding_filter_all">Alle (%1$d)</string>
+    <string name="onboarding_filter_chosen">Bereits ausgewählt (%1$d)</string>
+    <string name="onboarding_selected_count_limit">Ausgewählt %1$d / %2$d (Kostenlos)</string>
+    <string name="onboarding_selected_count">%1$d Apps ausgewählt</string>
+    <string name="onboarding_excluded_blocked">Bereits als gesperrte App ausgewählt</string>
+    <string name="onboarding_excluded_productive">Bereits als Lern-App ausgewählt</string>
+    <string name="onboarding_excluded_default">Bereits in einer anderen Kategorie ausgewählt</string>
+    <string name="onboarding_empty_chosen">Noch keine Apps ausgewählt.</string>
+    <string name="onboarding_empty_search">Keine Apps für \"%1$s\" gefunden</string>
+    <string name="onboarding_free_plan_limit_toast">Der kostenlose Plan erlaubt bis zu %1$d Apps pro Kategorie. Hol dir PRO für unbegrenzte Apps.</string>
+
+    <!-- Onboarding Step 4: Emergency Passphrase -->
+    <string name="onboarding_emergency_title">Notfall-Passphrase</string>
+    <string name="onboarding_emergency_subtitle">Erstelle eine lange Notfall-Passphrase (mindestens 35 Zeichen). Bei dringendem Bedarf entsperrt das Eintippen dieser Phrase deine Apps.</string>
+    <string name="onboarding_emergency_input_label">Notfall-Passphrase (mind. 35 Zeichen)</string>
+    <string name="onboarding_emergency_input_placeholder">z.B.: Ich verspreche heute fokussiert zu lernen und meine Ziele zu erreichen 2026!</string>
+    <string name="onboarding_emergency_hide">Passphrase ausblenden</string>
+    <string name="onboarding_emergency_show">Passphrase anzeigen</string>
+    <string name="onboarding_emergency_valid">✓ Passphrase gültig</string>
+    <string name="onboarding_emergency_chars_needed">Noch %1$d Zeichen benötigt</string>
+    <string name="onboarding_emergency_why_title">Warum 35+ Zeichen?</string>
+    <string name="onboarding_emergency_why_desc">Ein langer Satz erzeugt bewusste Reibung gegen Dopaminschleifen und stellt sicher, dass du nie dauerhaft ausgesperrt bist.</string>
+
+    <!-- Onboarding Step 5: Permissions & Battery Optimization -->
+    <string name="onboarding_perm_title">Erforderliche Berechtigungen</string>
+    <string name="onboarding_perm_subtitle">Unlockly benötigt Systemberechtigungen, um Lernzeiten zu erfassen, Limits durchzusetzen und im Hintergrund aktiv zu bleiben.</string>
+    <string name="onboarding_perm_battery_mandatory_notice">Das Deaktivieren der Akkuoptimierung ist erforderlich, damit Android den Hintergrunddienst nicht beendet.</string>
+    <string name="onboarding_perm_battery_required_badge">Erforderlich</string>
+    <string name="onboarding_perm_refresh">Berechtigungsstatus aktualisieren</string>
 </resources>

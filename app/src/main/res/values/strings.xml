@@ -17,6 +17,7 @@
     <string name="language_uk">Українська (UA)</string>
     <string name="language_es">Español (ESP)</string>
     <string name="language_pt">Português (POR)</string>
+    <string name="language_ru">Русский (RU)</string>
     <string name="close">Close</string>
 
     <!-- Home Screen -->
@@ -156,4 +157,53 @@
     <string name="btn_grant">Grant</string>
     <string name="btn_granted">Granted</string>
     <string name="btn_recheck_health">Re-check System Health</string>
+
+    <!-- Onboarding Navigation & Common -->
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_start">Start Unlockly</string>
+
+    <!-- Onboarding Step 0: Language Selection -->
+    <string name="onboarding_language_title">Choose Language</string>
+    <string name="onboarding_language_subtitle">Select your preferred language to get started</string>
+
+    <!-- Onboarding Step 1: Welcome -->
+    <string name="onboarding_welcome_title">Earn Your Screen Time</string>
+    <string name="onboarding_welcome_desc">Spend active minutes studying in your chosen learning apps to earn screen time for distractor apps. Turn habit into reward!</string>
+
+    <!-- Onboarding Steps 2 & 3: Apps Selection -->
+    <string name="onboarding_productive_title">Target / Productive Apps</string>
+    <string name="onboarding_productive_subtitle">Select all study apps where active usage will earn you social time.</string>
+    <string name="onboarding_blocked_title">Blocked / Distractor Apps</string>
+    <string name="onboarding_blocked_subtitle">Select social apps that will consume your wallet and get blocked when empty.</string>
+    <string name="onboarding_search_apps_hint">Search installed apps…</string>
+    <string name="onboarding_filter_all">All (%1$d)</string>
+    <string name="onboarding_filter_chosen">Already Chosen (%1$d)</string>
+    <string name="onboarding_selected_count_limit">Selected %1$d / %2$d (Free Plan)</string>
+    <string name="onboarding_selected_count">Selected %1$d apps</string>
+    <string name="onboarding_excluded_blocked">Already chosen as Blocked App</string>
+    <string name="onboarding_excluded_productive">Already chosen as Target App</string>
+    <string name="onboarding_excluded_default">Already chosen in another category</string>
+    <string name="onboarding_empty_chosen">No apps have been chosen yet.</string>
+    <string name="onboarding_empty_search">No apps found matching \"%1$s\"</string>
+    <string name="onboarding_free_plan_limit_toast">Free plan allows up to %1$d apps per category. Upgrade to PRO for unlimited apps.</string>
+
+    <!-- Onboarding Step 4: Emergency Passphrase -->
+    <string name="onboarding_emergency_title">Emergency Passphrase</string>
+    <string name="onboarding_emergency_subtitle">Create a long emergency passphrase (at least 35 symbols). If you truly need urgent access when an app is blocked, typing this entire phrase will unblock it. Avoid repeating duplicate symbols.</string>
+    <string name="onboarding_emergency_input_label">Emergency Passphrase (min 35 symbols)</string>
+    <string name="onboarding_emergency_input_placeholder">e.g., I promise to stay focused on my learning goals today 2026!</string>
+    <string name="onboarding_emergency_hide">Hide passphrase</string>
+    <string name="onboarding_emergency_show">Show passphrase</string>
+    <string name="onboarding_emergency_valid">✓ Passphrase valid</string>
+    <string name="onboarding_emergency_chars_needed">Requires %1$d more chars</string>
+    <string name="onboarding_emergency_why_title">Why 35+ characters?</string>
+    <string name="onboarding_emergency_why_desc">A long sentence introduces intentional friction to break dopamine loops, while still guaranteeing you can never be permanently locked out.</string>
+
+    <!-- Onboarding Step 5: Permissions & Battery Optimization -->
+    <string name="onboarding_perm_title">Required Permissions</string>
+    <string name="onboarding_perm_subtitle">Unlockly needs system access to detect active study sessions, enforce application limits, and keep tracking alive in the background.</string>
+    <string name="onboarding_perm_battery_mandatory_notice">Disabling battery optimization is required to prevent Android from closing the background tracker.</string>
+    <string name="onboarding_perm_battery_required_badge">Required</string>
+    <string name="onboarding_perm_refresh">Refresh Permission Status</string>
 </resources>

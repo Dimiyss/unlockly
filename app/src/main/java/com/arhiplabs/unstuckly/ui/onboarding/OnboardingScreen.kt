@@ -1,10 +1,13 @@
 package com.arhiplabs.unstuckly.ui.onboarding
 
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,16 +37,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import com.arhiplabs.unstuckly.R
 import com.arhiplabs.unstuckly.UnstucklyApplication
+import com.arhiplabs.unstuckly.data.model.HealthStatus
 import com.arhiplabs.unstuckly.data.model.InstalledApp
 import com.arhiplabs.unstuckly.data.model.InstalledAppHelper
 import com.arhiplabs.unstuckly.data.model.Rule
+import com.arhiplabs.unstuckly.domain.RuleEngine
 import com.arhiplabs.unstuckly.ui.components.AppIconImage
 import com.arhiplabs.unstuckly.ui.components.AppLogo
 import com.arhiplabs.unstuckly.ui.theme.*
 import kotlinx.coroutines.launch
-
-import com.arhiplabs.unstuckly.domain.RuleEngine
 
 private const val MIN_PASSWORD_LENGTH = 35
 
@@ -52,8 +60,26 @@ fun OnboardingScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val preferences = LocalAppPreferences.current
+    val healthMonitor = remember { UnstucklyApplication.instance.healthMonitor }
+    var healthStatus by remember { mutableStateOf(healthMonitor.checkHealth()) }
+
+    // Auto-refresh health status on resume (e.g. returning from battery settings)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                healthStatus = healthMonitor.checkHealth()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     var currentStep by remember { mutableIntStateOf(0) }
-    val totalSteps = 5
+    val totalSteps = 6
 
     var installedApps by remember { mutableStateOf<List<InstalledApp>>(emptyList()) }
     var isLoadingApps by remember { mutableStateOf(true) }
@@ -81,9 +107,10 @@ fun OnboardingScreen(
     }
 
     val isStepValid = when (currentStep) {
-        1 -> selectedProductive.isNotEmpty() && selectedProductive.size <= RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY
-        2 -> selectedBlocked.isNotEmpty() && selectedBlocked.size <= RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY
-        3 -> RuleEngine.isEmergencyPassphraseValid(emergencyPassword)
+        2 -> selectedProductive.isNotEmpty() && selectedProductive.size <= RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY
+        3 -> selectedBlocked.isNotEmpty() && selectedBlocked.size <= RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY
+        4 -> RuleEngine.isEmergencyPassphraseValid(emergencyPassword)
+        5 -> healthStatus.batteryOptimized
         else -> true
     }
 
@@ -91,7 +118,9 @@ fun OnboardingScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundDark)
-            .padding(20.dp)
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -126,17 +155,20 @@ fun OnboardingScreen(
                 contentAlignment = Alignment.Center
             ) {
                 when (currentStep) {
-                    0 -> WelcomeStep()
-                    1 -> InstalledAppSelectionStep(
-                        title = "Target / Productive Apps",
-                        subtitle = "Select all study apps where active usage will earn you social time.",
+                    0 -> LanguageSelectionStep(
+                        preferences = preferences
+                    )
+                    1 -> WelcomeStep()
+                    2 -> InstalledAppSelectionStep(
+                        title = stringResource(R.string.onboarding_productive_title),
+                        subtitle = stringResource(R.string.onboarding_productive_subtitle),
                         icon = Icons.Default.School,
                         accentColor = SuccessGreen,
                         installedApps = installedApps,
                         isLoading = isLoadingApps,
                         selectedPackages = selectedProductive,
                         excludedPackages = selectedBlocked,
-                        excludedLabel = "Already chosen as Blocked App",
+                        excludedLabel = stringResource(R.string.onboarding_excluded_blocked),
                         onToggle = { pkg ->
                             selectedProductive = if (selectedProductive.contains(pkg)) {
                                 selectedProductive - pkg
@@ -145,16 +177,16 @@ fun OnboardingScreen(
                             }
                         }
                     )
-                    2 -> InstalledAppSelectionStep(
-                        title = "Blocked / Distractor Apps",
-                        subtitle = "Select social apps that will consume your wallet and get blocked when empty.",
+                    3 -> InstalledAppSelectionStep(
+                        title = stringResource(R.string.onboarding_blocked_title),
+                        subtitle = stringResource(R.string.onboarding_blocked_subtitle),
                         icon = Icons.Default.Block,
                         accentColor = ErrorRose,
                         installedApps = installedApps,
                         isLoading = isLoadingApps,
                         selectedPackages = selectedBlocked,
                         excludedPackages = selectedProductive,
-                        excludedLabel = "Already chosen as Target App",
+                        excludedLabel = stringResource(R.string.onboarding_excluded_productive),
                         onToggle = { pkg ->
                             selectedBlocked = if (selectedBlocked.contains(pkg)) {
                                 selectedBlocked - pkg
@@ -163,11 +195,14 @@ fun OnboardingScreen(
                             }
                         }
                     )
-                    3 -> EmergencyPasswordStep(
+                    4 -> EmergencyPasswordStep(
                         password = emergencyPassword,
                         onPasswordChange = { emergencyPassword = it }
                     )
-                    4 -> PermissionSetupStep()
+                    5 -> PermissionSetupStep(
+                        healthStatus = healthStatus,
+                        onRefresh = { healthStatus = healthMonitor.checkHealth() }
+                    )
                 }
             }
 
@@ -185,7 +220,7 @@ fun OnboardingScreen(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary)
                     ) {
-                        Text("Back")
+                        Text(stringResource(R.string.onboarding_back))
                     }
                 } else {
                     Spacer(modifier = Modifier.width(1.dp))
@@ -219,10 +254,131 @@ fun OnboardingScreen(
                     )
                 ) {
                     Text(
-                        text = if (currentStep == totalSteps - 1) "Start Unlockly" else "Continue",
+                        text = if (currentStep == totalSteps - 1) stringResource(R.string.onboarding_start) else stringResource(R.string.onboarding_continue),
                         fontWeight = FontWeight.Bold,
                         color = if (isStepValid) Color.White else TextMuted
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LanguageSelectionStep(
+    preferences: AppPreferences
+) {
+    val currentLanguage by preferences.language.collectAsState()
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .background(PrimaryIndigo.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Translate,
+                contentDescription = null,
+                tint = PrimaryIndigo,
+                modifier = Modifier.size(34.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(R.string.onboarding_language_title),
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.onboarding_language_subtitle),
+            style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            AppLanguage.entries.forEach { lang ->
+                val isSelected = currentLanguage == lang
+                val backgroundColor by animateColorAsState(
+                    if (isSelected) PrimaryIndigo.copy(alpha = 0.18f)
+                    else SurfaceDark,
+                    label = "langBg"
+                )
+                val borderColor = if (isSelected) PrimaryIndigo else SurfaceVariantDark.copy(alpha = 0.6f)
+
+                Card(
+                    onClick = { preferences.setLanguage(lang) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = backgroundColor),
+                    border = BorderStroke(if (isSelected) 2.dp else 1.dp, borderColor),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 18.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = lang.flag,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = lang.displayName,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isSelected) Color.White else TextPrimary
+                                )
+                            )
+                        }
+
+                        if (isSelected) {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(PrimaryIndigo),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .border(1.5.dp, TextMuted, CircleShape)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -243,7 +399,7 @@ fun WelcomeStep() {
         Spacer(modifier = Modifier.height(28.dp))
 
         Text(
-            text = "Earn Your Screen Time",
+            text = stringResource(R.string.onboarding_welcome_title),
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary
@@ -254,7 +410,7 @@ fun WelcomeStep() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Spend active minutes studying in your chosen learning apps to earn screen time for distractor apps. Turn habit into reward!",
+            text = stringResource(R.string.onboarding_welcome_desc),
             style = MaterialTheme.typography.bodyLarge.copy(color = TextSecondary),
             textAlign = TextAlign.Center
         )
@@ -271,7 +427,7 @@ fun InstalledAppSelectionStep(
     isLoading: Boolean,
     selectedPackages: Set<String>,
     excludedPackages: Set<String> = emptySet(),
-    excludedLabel: String = "Already chosen in another category",
+    excludedLabel: String = "",
     maxSelection: Int? = RuleEngine.MAX_FREE_TIER_APPS_PER_CATEGORY,
     onToggle: (String) -> Unit
 ) {
@@ -323,7 +479,7 @@ fun InstalledAppSelectionStep(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search installed apps...", color = TextMuted, fontSize = 13.sp) },
+            placeholder = { Text(stringResource(R.string.onboarding_search_apps_hint), color = TextMuted, fontSize = 13.sp) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
@@ -364,7 +520,7 @@ fun InstalledAppSelectionStep(
                 FilterChip(
                     selected = !showOnlySelected,
                     onClick = { showOnlySelected = false },
-                    label = { Text("All (${installedApps.size})", fontSize = 11.sp) },
+                    label = { Text(stringResource(R.string.onboarding_filter_all, installedApps.size), fontSize = 11.sp) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = accentColor.copy(alpha = 0.2f),
                         selectedLabelColor = accentColor,
@@ -376,7 +532,7 @@ fun InstalledAppSelectionStep(
                 FilterChip(
                     selected = showOnlySelected,
                     onClick = { showOnlySelected = true },
-                    label = { Text("Already Chosen ($validSelectedCount)", fontSize = 11.sp) },
+                    label = { Text(stringResource(R.string.onboarding_filter_chosen, validSelectedCount), fontSize = 11.sp) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = accentColor.copy(alpha = 0.2f),
                         selectedLabelColor = accentColor,
@@ -387,7 +543,11 @@ fun InstalledAppSelectionStep(
             }
 
             Text(
-                text = if (maxSelection != null) "Selected $validSelectedCount / $maxSelection (Free Plan)" else "Selected $validSelectedCount apps",
+                text = if (maxSelection != null) {
+                    stringResource(R.string.onboarding_selected_count_limit, validSelectedCount, maxSelection)
+                } else {
+                    stringResource(R.string.onboarding_selected_count, validSelectedCount)
+                },
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = if (maxSelection != null && validSelectedCount >= maxSelection) WarningAmber else accentColor,
                     fontWeight = FontWeight.SemiBold
@@ -415,9 +575,9 @@ fun InstalledAppSelectionStep(
             ) {
                 Text(
                     text = if (showOnlySelected && validSelectedCount == 0) {
-                        "No apps have been chosen yet."
+                        stringResource(R.string.onboarding_empty_chosen)
                     } else {
-                        "No apps found matching \"$searchQuery\""
+                        stringResource(R.string.onboarding_empty_search, searchQuery)
                     },
                     color = TextMuted,
                     style = MaterialTheme.typography.bodyMedium
@@ -442,7 +602,7 @@ fun InstalledAppSelectionStep(
                                     if (maxSelection != null && validSelectedCount >= maxSelection) {
                                         Toast.makeText(
                                             context,
-                                            "Free plan allows up to $maxSelection apps per category. Upgrade to PRO for unlimited apps.",
+                                            context.getString(R.string.onboarding_free_plan_limit_toast, maxSelection),
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
@@ -549,7 +709,7 @@ fun EmergencyPasswordStep(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = "Emergency Passphrase",
+                text = stringResource(R.string.onboarding_emergency_title),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary
@@ -560,7 +720,7 @@ fun EmergencyPasswordStep(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Create a long emergency passphrase (at least 35 symbols). If you truly need urgent access when an app is blocked, typing this entire phrase will unblock it. Avoid repeating duplicate symbols.",
+            text = stringResource(R.string.onboarding_emergency_subtitle),
             style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
         )
 
@@ -569,14 +729,14 @@ fun EmergencyPasswordStep(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Emergency Passphrase (min 35 symbols)") },
-            placeholder = { Text("e.g., I promise to stay focused on my learning goals today 2026!", color = TextMuted) },
+            label = { Text(stringResource(R.string.onboarding_emergency_input_label)) },
+            placeholder = { Text(stringResource(R.string.onboarding_emergency_input_placeholder), color = TextMuted) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (passwordVisible) "Hide passphrase" else "Show passphrase",
+                        contentDescription = stringResource(if (passwordVisible) R.string.onboarding_emergency_hide else R.string.onboarding_emergency_show),
                         tint = TextSecondary
                     )
                 }
@@ -604,7 +764,7 @@ fun EmergencyPasswordStep(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (isValid) "✓ Passphrase valid" else (validation.error ?: "Requires ${MIN_PASSWORD_LENGTH - length} more chars"),
+                text = if (isValid) stringResource(R.string.onboarding_emergency_valid) else (validation.error ?: stringResource(R.string.onboarding_emergency_chars_needed, MIN_PASSWORD_LENGTH - length)),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = statusColor,
                     fontWeight = FontWeight.SemiBold
@@ -649,7 +809,7 @@ fun EmergencyPasswordStep(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Why 35+ characters?",
+                        text = stringResource(R.string.onboarding_emergency_why_title),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
@@ -658,7 +818,7 @@ fun EmergencyPasswordStep(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "A long sentence introduces intentional friction to break dopamine loops, while still guaranteeing you can never be permanently locked out.",
+                    text = stringResource(R.string.onboarding_emergency_why_desc),
                     style = MaterialTheme.typography.bodySmall.copy(color = TextSecondary)
                 )
             }
@@ -667,10 +827,11 @@ fun EmergencyPasswordStep(
 }
 
 @Composable
-fun PermissionSetupStep() {
+fun PermissionSetupStep(
+    healthStatus: HealthStatus,
+    onRefresh: () -> Unit
+) {
     val context = LocalContext.current
-    val healthMonitor = remember { UnstucklyApplication.instance.healthMonitor }
-    var healthStatus by remember { mutableStateOf(healthMonitor.checkHealth()) }
 
     Column(
         horizontalAlignment = Alignment.Start,
@@ -679,20 +840,89 @@ fun PermissionSetupStep() {
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "Required Permissions",
+            text = stringResource(R.string.onboarding_perm_title),
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = TextPrimary)
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = "Unlockly needs system access to detect active study sessions and enforce application limits.",
+            text = stringResource(R.string.onboarding_perm_subtitle),
             style = MaterialTheme.typography.bodyMedium.copy(color = TextSecondary)
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
+        // Mandatory Battery Optimization Notice
+        if (!healthStatus.batteryOptimized) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = WarningAmber.copy(alpha = 0.12f)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = WarningAmber,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.onboarding_perm_battery_mandatory_notice),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = WarningAmber,
+                            fontWeight = FontWeight.Medium
+                        )
+                    )
+                }
+            }
+        }
+
+        // 1. Mandatory: Disable Battery Optimization
         PermissionItem(
-            title = "Usage Access",
-            description = "Detects when productive or social apps are in the foreground.",
+            title = stringResource(R.string.perm_battery_title),
+            description = stringResource(R.string.perm_battery_desc),
+            isGranted = healthStatus.batteryOptimized,
+            isMandatory = true,
+            onGrant = {
+                val packageName = context.packageName
+                val requestIntent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:$packageName")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                try {
+                    context.startActivity(requestIntent)
+                } catch (e1: Exception) {
+                    try {
+                        val detailsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:$packageName")
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(detailsIntent)
+                    } catch (e2: Exception) {
+                        try {
+                            val ignoreSettingsIntent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(ignoreSettingsIntent)
+                        } catch (e3: Exception) {
+                            Toast.makeText(context, "Could not open battery settings", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 2. Usage Access
+        PermissionItem(
+            title = stringResource(R.string.perm_usage_access_title),
+            description = stringResource(R.string.perm_usage_access_desc),
             isGranted = healthStatus.usageAccessGranted,
             onGrant = {
                 context.startActivity(
@@ -703,9 +933,10 @@ fun PermissionSetupStep() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // 3. Accessibility Service
         PermissionItem(
-            title = "Accessibility Service",
-            description = "Measures real user interaction (scrolls, touches) to ensure active study time.",
+            title = stringResource(R.string.perm_accessibility_title),
+            description = stringResource(R.string.perm_accessibility_desc),
             isGranted = healthStatus.accessibilityGranted,
             onGrant = {
                 context.startActivity(
@@ -716,9 +947,10 @@ fun PermissionSetupStep() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // 4. Display Over Other Apps
         PermissionItem(
-            title = "Display Over Other Apps",
-            description = "Shows the blocker overlay when your social wallet expires.",
+            title = stringResource(R.string.perm_overlay_title),
+            description = stringResource(R.string.perm_overlay_desc),
             isGranted = healthStatus.overlayGranted,
             onGrant = {
                 context.startActivity(
@@ -730,12 +962,12 @@ fun PermissionSetupStep() {
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(
-            onClick = { healthStatus = healthMonitor.checkHealth() },
+            onClick = onRefresh,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Icon(imageVector = Icons.Default.Refresh, contentDescription = null, tint = PrimaryIndigo)
             Spacer(modifier = Modifier.width(6.dp))
-            Text("Refresh Permission Status", color = PrimaryIndigo)
+            Text(stringResource(R.string.onboarding_perm_refresh), color = PrimaryIndigo)
         }
     }
 }
@@ -745,11 +977,17 @@ fun PermissionItem(
     title: String,
     description: String,
     isGranted: Boolean,
+    isMandatory: Boolean = false,
     onGrant: () -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isMandatory && !isGranted) WarningAmber.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(
+            1.dp,
+            if (isMandatory && !isGranted) WarningAmber.copy(alpha = 0.6f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        ),
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -759,18 +997,37 @@ fun PermissionItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Icon(
                         imageVector = if (isGranted) Icons.Default.CheckCircle else Icons.Default.Warning,
                         contentDescription = null,
                         tint = if (isGranted) SuccessGreen else WarningAmber,
                         modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(text = title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    if (isMandatory && !isGranted) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = WarningAmber.copy(alpha = 0.2f),
+                            contentColor = WarningAmber
+                        ) {
+                            Text(
+                                text = stringResource(R.string.onboarding_perm_battery_required_badge),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = description, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -778,13 +1035,25 @@ fun PermissionItem(
             if (!isGranted) {
                 Button(
                     onClick = onGrant,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isMandatory) WarningAmber else PrimaryIndigo
+                    ),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
                 ) {
-                    Text(androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.btn_grant), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.btn_grant),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isMandatory) Color.Black else Color.White
+                    )
                 }
             } else {
-                Text(androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.btn_granted), color = SuccessGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Text(
+                    text = stringResource(R.string.btn_granted),
+                    color = SuccessGreen,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
             }
         }
     }

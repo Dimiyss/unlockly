@@ -23,7 +23,8 @@ enum class AppLanguage(val code: String, val displayName: String, val flag: Stri
     DE("de", "Deutsch", "🇩🇪"),
     UA("uk", "Українська", "🇺🇦"),
     ESP("es", "Español", "🇪🇸"),
-    POR("pt", "Português", "🇵🇹");
+    POR("pt", "Português", "🇵🇹"),
+    RU("ru", "Русский", "🇷🇺");
 
     companion object {
         fun fromCode(code: String): AppLanguage {

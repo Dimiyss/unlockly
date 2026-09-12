@@ -17,6 +17,7 @@
     <string name="language_uk">Українська (UA)</string>
     <string name="language_es">Español (ESP)</string>
     <string name="language_pt">Português (POR)</string>
+    <string name="language_ru">Русский (RU)</string>
     <string name="close">Cerrar</string>
 
     <!-- Home Screen -->
@@ -156,4 +157,53 @@
     <string name="btn_grant">Permitir</string>
     <string name="btn_granted">Permitido</string>
     <string name="btn_recheck_health">Comprobar estado del sistema</string>
+
+    <!-- Onboarding Navigation & Common -->
+    <string name="onboarding_back">Atrás</string>
+    <string name="onboarding_continue">Continuar</string>
+    <string name="onboarding_start">Iniciar Unlockly</string>
+
+    <!-- Onboarding Step 0: Language Selection -->
+    <string name="onboarding_language_title">Elige tu idioma</string>
+    <string name="onboarding_language_subtitle">Selecciona tu idioma preferido para comenzar</string>
+
+    <!-- Onboarding Step 1: Welcome -->
+    <string name="onboarding_welcome_title">Gana tu tiempo en pantalla</string>
+    <string name="onboarding_welcome_desc">Pasa minutos de estudio activo en apps de aprendizaje para ganar tiempo en redes sociales. ¡Convierte el hábito en recompensa!</string>
+
+    <!-- Onboarding Steps 2 & 3: Apps Selection -->
+    <string name="onboarding_productive_title">Apps productivas de estudio</string>
+    <string name="onboarding_productive_subtitle">Selecciona las apps de estudio cuyo uso activo te otorgará tiempo para redes sociales.</string>
+    <string name="onboarding_blocked_title">Apps bloqueadas / distractoras</string>
+    <string name="onboarding_blocked_subtitle">Selecciona las apps que consumirán tu saldo y se bloquearán cuando se agote.</string>
+    <string name="onboarding_search_apps_hint">Buscar apps instaladas…</string>
+    <string name="onboarding_filter_all">Todas (%1$d)</string>
+    <string name="onboarding_filter_chosen">Ya elegidas (%1$d)</string>
+    <string name="onboarding_selected_count_limit">Seleccionadas %1$d / %2$d (Plan Gratis)</string>
+    <string name="onboarding_selected_count">%1$d apps seleccionadas</string>
+    <string name="onboarding_excluded_blocked">Ya elegida como app bloqueada</string>
+    <string name="onboarding_excluded_productive">Ya elegida como app de estudio</string>
+    <string name="onboarding_excluded_default">Ya elegida en otra categoría</string>
+    <string name="onboarding_empty_chosen">Aún no has elegido ninguna app.</string>
+    <string name="onboarding_empty_search">No se encontraron apps para \"%1$s\"</string>
+    <string name="onboarding_free_plan_limit_toast">El plan gratuito permite hasta %1$d apps por categoría. Actualiza a PRO para apps ilimitadas.</string>
+
+    <!-- Onboarding Step 4: Emergency Passphrase -->
+    <string name="onboarding_emergency_title">Frase de emergencia</string>
+    <string name="onboarding_emergency_subtitle">Crea una frase de contraseña larga (al menos 35 caracteres). Si necesitas acceso urgente, escribir esta frase completa desbloqueará las apps.</string>
+    <string name="onboarding_emergency_input_label">Frase de emergencia (mín. 35 caracteres)</string>
+    <string name="onboarding_emergency_input_placeholder">ej., ¡Prometo mantenerme enfocado en mis estudios hoy 2026!</string>
+    <string name="onboarding_emergency_hide">Ocultar frase</string>
+    <string name="onboarding_emergency_show">Mostrar frase</string>
+    <string name="onboarding_emergency_valid">✓ Frase de contraseña válida</string>
+    <string name="onboarding_emergency_chars_needed">Se necesitan %1$d caracteres más</string>
+    <string name="onboarding_emergency_why_title">¿Por qué 35+ caracteres?</string>
+    <string name="onboarding_emergency_why_desc">Una frase larga introduce una fricción intencionada para romper los bucles de dopamina, garantizando que nunca te quedes bloqueado permanentemente.</string>
+
+    <!-- Onboarding Step 5: Permissions & Battery Optimization -->
+    <string name="onboarding_perm_title">Permisos requeridos</string>
+    <string name="onboarding_perm_subtitle">Unlockly necesita acceso al sistema para registrar el estudio, aplicar límites y mantenerse activo en segundo plano.</string>
+    <string name="onboarding_perm_battery_mandatory_notice">Desactivar la optimización de batería es obligatorio para evitar que Android detenga el servicio.</string>
+    <string name="onboarding_perm_battery_required_badge">Requerido</string>
+    <string name="onboarding_perm_refresh">Actualizar estado de permisos</string>
 </resources>
