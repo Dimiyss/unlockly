@@ -89,8 +89,8 @@ class EarnSessionManagerTest {
         )
         fakeRuleDao.insertRule(rule)
 
-        // Simulate idle user: last interaction was 61 seconds ago
-        val pastTime = System.currentTimeMillis() - 61_000L
+        // Simulate idle user: last interaction was 121 seconds ago (> 120s IDLE_THRESHOLD_MS)
+        val pastTime = System.currentTimeMillis() - 121_000L
         InteractionTrackerService.updateLastInteractionTimestamp(pastTime)
 
         earnSessionManager.tick(testProductivePackage, isScreenInteractive = true)
@@ -121,17 +121,17 @@ class EarnSessionManagerTest {
     }
 
     @Test
-    fun testTick_activeStudy_accumulatesStudySeconds() = runBlocking {
+    fun testTick_activeStudy_accumulatesStudySecondsAndIncrementalReward() = runBlocking {
         val rule = Rule(
             id = 1L,
             productivePackages = listOf(testProductivePackage),
             blockedPackages = listOf(testBlockedPackage),
             productiveMinutesTarget = 30, // 1800 seconds
-            rewardMinutes = 20 // 1200 seconds
+            rewardMinutes = 20 // 1200 seconds -> ratio 2/3
         )
         fakeRuleDao.insertRule(rule)
 
-        // 3 active study ticks
+        // 3 active study ticks: 3 * (2/3) = 2 seconds of reward
         earnSessionManager.tick(testProductivePackage, isScreenInteractive = true)
         earnSessionManager.tick(testProductivePackage, isScreenInteractive = true)
         earnSessionManager.tick(testProductivePackage, isScreenInteractive = true)
@@ -141,33 +141,30 @@ class EarnSessionManagerTest {
 
         val wallet = walletManager.getWallet()
         assertEquals(3L, wallet.productiveStudySecondsToday)
-        // Since initial target (1800s) has not been reached yet, reward remains 0
-        assertEquals(0L, wallet.availableSeconds)
+        assertEquals(2L, wallet.availableSeconds)
+        assertEquals(2L, wallet.earnedTodaySeconds)
     }
 
     @Test
-    fun testTick_initialMilestoneReached_depositsFirstReward() = runBlocking {
+    fun testTick_oneMinuteLesson_accruesFortySecondsReward() = runBlocking {
         val rule = Rule(
             id = 1L,
             productivePackages = listOf(testProductivePackage),
             blockedPackages = listOf(testBlockedPackage),
-            productiveMinutesTarget = 1, // 60 seconds
-            rewardMinutes = 1 // 60 seconds
+            productiveMinutesTarget = 30,
+            rewardMinutes = 20
         )
         fakeRuleDao.insertRule(rule)
 
-        // Simulate user has already studied 59 seconds
-        fakeWalletDao.insertOrUpdateWallet(
-            Wallet(productiveStudySecondsToday = 59L)
-        )
-
-        // 60th tick hits the milestone!
-        earnSessionManager.tick(testProductivePackage, isScreenInteractive = true)
+        // Simulate a 1-minute (60 ticks) lesson in a target app like Falou
+        repeat(60) {
+            earnSessionManager.tick(testProductivePackage, isScreenInteractive = true)
+        }
 
         val wallet = walletManager.getWallet()
         assertEquals(60L, wallet.productiveStudySecondsToday)
-        assertEquals(60L, wallet.availableSeconds)
-        assertEquals(60L, wallet.earnedTodaySeconds)
+        assertEquals(40L, wallet.availableSeconds)
+        assertEquals(40L, wallet.earnedTodaySeconds)
     }
 
     @Test

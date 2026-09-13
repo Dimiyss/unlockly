@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">Unstuckly використовує Спеціальні можливості для фіксації активності під час продуктивного навчання та контролю лімітів соцмереж.</string>
-    <string name="tagline">Заробляй екранний час</string>
+    <string name="tagline">Розкрий свій потенціал</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Налаштування</string>
@@ -17,6 +17,7 @@
     <string name="language_uk">Українська (UA)</string>
     <string name="language_es">Español (ESP)</string>
     <string name="language_pt">Português (POR)</string>
+    <string name="language_ru">Русский (RU)</string>
     <string name="close">Закрити</string>
 
     <!-- Home Screen -->
@@ -55,11 +56,25 @@
     <string name="wallet_status_unlocked">Соцмережі розблоковано</string>
     <string name="wallet_status_unfrozen">❄️ Пароль розмороження активний</string>
 
+    <string name="time_available_now">Доступно зараз</string>
+    <string name="social_time_available">вільного часу для соцмереж</string>
+    <string name="time_to_study_title">Час навчання</string>
+    <string name="time_to_study_desc">Відкрийте навчальний додаток, щоб заробити час для соцмереж</string>
+    <string name="focus_benefit_hint">Більше фокусу — більше часу для того, що ти любиш</string>
+    <string name="next_focus_session_title">Ціль фокус-сесії</string>
+    <string name="after_session_available">Після сесії буде</string>
+    <string name="today_title">Сьогодні</string>
+    <string name="details_link">Деталі</string>
+    <string name="used_today">Використано сьогодні</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">Більше контролю, менше зусиль</string>
+    <string name="btn_get_pro">Придбати PRO</string>
+
     <string name="initial_study_target_title">Початкова ціль навчання</string>
     <string name="initial_study_target_desc">Мінімум навчання перед відкриттям соцмереж</string>
     <string name="initial_study_target_met">Ціль виконано • пройдено %1$s сьогодні</string>
-    <string name="target_unlocked_badge">✅ Розблоковано</string>
-    <string name="target_locked_badge">🔒 Заблоковано</string>
+    <string name="target_unlocked_badge">🔓</string>
+    <string name="target_locked_badge">🔒</string>
     <string name="target_required">Потрібно %1$s з %2$s хв</string>
     <string name="target_reward_allowance">Винагорода: +%1$s хв доступу</string>
     <string name="target_reward_credited">+%1$s хв винагороди нараховано</string>
@@ -156,4 +171,83 @@
     <string name="btn_grant">Надати</string>
     <string name="btn_granted">Надано</string>
     <string name="btn_recheck_health">Перевірити стан системи</string>
+
+    <!-- Onboarding Navigation & Common -->
+    <string name="onboarding_back">Назад</string>
+    <string name="onboarding_continue">Продовжити</string>
+    <string name="onboarding_start">Почати Unlockly</string>
+
+    <!-- Onboarding Step 0: Language Selection -->
+    <string name="onboarding_language_title">Оберіть мову</string>
+    <string name="onboarding_language_subtitle">Виберіть бажану мову додатку для початку</string>
+
+    <!-- Onboarding Step 1: Welcome -->
+    <string name="onboarding_welcome_title">Заробляй екранний час</string>
+    <string name="onboarding_welcome_desc">Проводьте корисні хвилини у навчальних додатках, щоб заробляти час для розважальних. Перетворіть звичку на винагороду!</string>
+
+    <!-- Onboarding Steps 2 & 3: Apps Selection -->
+    <string name="onboarding_productive_title">Корисні додатки для навчання</string>
+    <string name="onboarding_productive_subtitle">Виберіть навчальні додатки, де активне використання зароблятиме вам час.</string>
+    <string name="onboarding_blocked_title">Обмежені / розважальні додатки</string>
+    <string name="onboarding_blocked_subtitle">Виберіть додатки, які витрачатимуть ваш баланс і блокуватимуться, коли він порожній.</string>
+    <string name="onboarding_search_apps_hint">Пошук встановлених додатків…</string>
+    <string name="onboarding_filter_all">Всі (%1$d)</string>
+    <string name="onboarding_filter_chosen">Вже обрано (%1$d)</string>
+    <string name="onboarding_selected_count_limit">Обрано %1$d / %2$d (Безкоштовно)</string>
+    <string name="onboarding_selected_count">Обрано додатків: %1$d</string>
+    <string name="onboarding_excluded_blocked">Вже обрано як заблокований додаток</string>
+    <string name="onboarding_excluded_productive">Вже обрано як навчальний додаток</string>
+    <string name="onboarding_excluded_default">Вже обрано в іншій категорії</string>
+    <string name="onboarding_empty_chosen">Жодного додатку ще не обрано.</string>
+    <string name="onboarding_empty_search">Не знайдено додатків за запитом \"%1$s\"</string>
+    <string name="onboarding_free_plan_limit_toast">Безкоштовний план дозволяє до %1$d додатків у кожній категорії. Перейдіть на PRO для безліміту.</string>
+
+    <!-- Onboarding Step 4: Emergency Passphrase -->
+    <string name="onboarding_emergency_title">Екстрена парольна фраза</string>
+    <string name="onboarding_emergency_subtitle">Створіть довгу парольну фразу (від 35 символів). Якщо вам терміново знадобиться доступ, введення цієї фрази розблокує додаток. Уникайте повторення однакових символів.</string>
+    <string name="onboarding_emergency_input_label">Екстрена фраза (мін. 35 символів)</string>
+    <string name="onboarding_emergency_input_placeholder">наприклад, Я обіцяю залишатися зосередженим на навчанні щодня 2026!</string>
+    <string name="onboarding_emergency_hide">Приховати фразу</string>
+    <string name="onboarding_emergency_show">Показати фразу</string>
+    <string name="onboarding_emergency_valid">✓ Парольна фраза валідна</string>
+    <string name="onboarding_emergency_chars_needed">Потрібно ще %1$d симв.</string>
+    <string name="onboarding_emergency_why_title">Чому 35+ символів?</string>
+    <string name="onboarding_emergency_why_desc">Довге речення створює усвідомлене тертя для подолання дофамінових петель, гарантуючи, що ви ніколи не будете заблоковані назавжди.</string>
+
+    <!-- Onboarding Step 5: Permissions & Battery Optimization -->
+    <string name="onboarding_perm_title">Необхідні дозволи</string>
+    <string name="onboarding_perm_subtitle">Unlockly потребує системних дозволів для фіксації навчання, контролю лімітів та фонової роботи.</string>
+    <string name="onboarding_perm_battery_mandatory_notice">Вимкнення оптимізації батареї обов\'язкове для безперервної роботи фонового трекера.</string>
+    <string name="onboarding_perm_battery_required_badge">Обов\'язково</string>
+    <string name="onboarding_perm_refresh">Оновити статус дозволів</string>
+
+    <!-- Emergency Passphrase Recovery -->
+    <string name="forgot_emergency_passphrase">Забули пароль?</string>
+    <string name="emergency_recovery_title">Відновлення пароля</string>
+    <string name="emergency_recovery_subtitle">Оберіть усвідомлений спосіб відновлення без шкоди для вашої цифрової дисципліни.</string>
+    <string name="recovery_option_challenge_title">Челендж на 150 символів</string>
+    <string name="recovery_option_challenge_desc">Передрук маніфесту усвідомленості вручну (копіювання вимкнено). Доступно 1 раз на 7 днів.</string>
+    <string name="recovery_challenge_available">Доступно зараз (1р / тиждень)</string>
+    <string name="recovery_challenge_cooldown">Буде доступно через %1$s</string>
+    <string name="recovery_option_timelock_title">24-годинний таймер очікування</string>
+    <string name="recovery_option_timelock_desc">Запустіть 24-годинний період охолодження. Після завершення ви зможете встановити новий пароль без передруку.</string>
+    <string name="recovery_timelock_active_badge">Активно: залишилось %1$s</string>
+    <string name="recovery_timelock_ready_badge">Готово! Можна встановити пароль</string>
+    <string name="recovery_start_timelock_btn">Запустити 24г таймер</string>
+    <string name="recovery_cancel_timelock_btn">Скасувати скидання</string>
+    <string name="recovery_challenge_dialog_title">Маніфест усвідомленості</string>
+    <string name="recovery_challenge_instructions">Введіть точний текст нижче вручну. Вставка з буфера заблокована для усвідомленого зусилля.</string>
+    <string name="recovery_challenge_manifesto_text">Я усвідомлено обираю керувати своїм часом та увагою, а не дозволяти алгоритмам керувати моїм життям. Я відновлюю цей пароль відповідально для власних цілей.</string>
+    <string name="recovery_challenge_paste_blocked">Вставка заборонена. Будь ласка, вводьте текст вручну.</string>
+    <string name="recovery_challenge_progress">%1$d / %2$d символів</string>
+    <string name="recovery_challenge_completed_btn">Перейти до нового пароля</string>
+    <string name="recovery_set_new_title">Встановіть новий пароль</string>
+    <string name="recovery_set_new_subtitle">Введіть нову екстрену парольну фразу (від 35 символів).</string>
+    <string name="recovery_set_new_confirm_btn">Зберегти новий пароль</string>
+    <string name="recovery_banner_active_title">Триває скидання пароля</string>
+    <string name="recovery_banner_active_desc">24г таймер охолодження активний. Розблокується через %1$s.</string>
+    <string name="recovery_banner_ready_title">Скидання пароля готове</string>
+    <string name="recovery_banner_ready_desc">24 години минули. Натисніть, щоб встановити новий емерженсі пароль.</string>
+    <string name="recovery_banner_reset_btn">Встановити новий пароль</string>
+    <string name="recovery_success_toast">Екстрений пароль успішно оновлено</string>
 </resources>

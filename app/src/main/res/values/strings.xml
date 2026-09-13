@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">Unstuckly uses Accessibility Service to track active engagement during productive app study sessions and enforce social app limits.</string>
-    <string name="tagline">Earn Social Time</string>
+    <string name="tagline">Unlock your potential</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Preferences</string>
@@ -17,6 +17,7 @@
     <string name="language_uk">Українська (UA)</string>
     <string name="language_es">Español (ESP)</string>
     <string name="language_pt">Português (POR)</string>
+    <string name="language_ru">Русский (RU)</string>
     <string name="close">Close</string>
 
     <!-- Home Screen -->
@@ -55,17 +56,31 @@
     <string name="wallet_status_unlocked">Social apps unlocked</string>
     <string name="wallet_status_unfrozen">❄️ Unfreeze pass active — apps unblocked</string>
 
+    <string name="time_available_now">Available now</string>
+    <string name="social_time_available">Social Media Time</string>
+    <string name="time_to_study_title">Time to Focus</string>
+    <string name="time_to_study_desc">Open a Study app to finish your study session</string>
+    <string name="focus_benefit_hint">More focus — more time for what you love</string>
+    <string name="next_focus_session_title">Focus session target</string>
+    <string name="after_session_available">After session:</string>
+    <string name="today_title">Today</string>
+    <string name="details_link">Details</string>
+    <string name="used_today">Used Today</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">More control, less effort</string>
+    <string name="btn_get_pro">Get PRO</string>
+
     <string name="initial_study_target_title">Initial Study Target</string>
     <string name="initial_study_target_desc">Minimum requirement before social apps unlock</string>
     <string name="initial_study_target_met">Target met • %1$s studied today</string>
-    <string name="target_unlocked_badge">✅ Unlocked</string>
-    <string name="target_locked_badge">🔒 Locked</string>
+    <string name="target_unlocked_badge">🔓</string>
+    <string name="target_locked_badge">🔒</string>
     <string name="target_required">%1$s / %2$sm required</string>
     <string name="target_reward_allowance">Reward: +%1$sm allowance</string>
     <string name="target_reward_credited">+%1$sm reward credited</string>
 
     <string name="metric_studied">Studied</string>
-    <string name="metric_earned">Earned</string>
+    <string name="metric_earned">Social Time</string>
     <string name="metric_spent">Spent</string>
 
     <string name="store_promo_title">Store &amp; Power-Ups</string>
@@ -156,4 +171,83 @@
     <string name="btn_grant">Grant</string>
     <string name="btn_granted">Granted</string>
     <string name="btn_recheck_health">Re-check System Health</string>
+
+    <!-- Onboarding Navigation & Common -->
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_start">Start Unlockly</string>
+
+    <!-- Onboarding Step 0: Language Selection -->
+    <string name="onboarding_language_title">Choose Language</string>
+    <string name="onboarding_language_subtitle">Select your preferred language to get started</string>
+
+    <!-- Onboarding Step 1: Welcome -->
+    <string name="onboarding_welcome_title">Earn Your Screen Time</string>
+    <string name="onboarding_welcome_desc">Spend active minutes studying in your chosen learning apps to earn screen time for distractor apps. Turn habit into reward!</string>
+
+    <!-- Onboarding Steps 2 & 3: Apps Selection -->
+    <string name="onboarding_productive_title">Target / Productive Apps</string>
+    <string name="onboarding_productive_subtitle">Select all study apps where active usage will earn you social time.</string>
+    <string name="onboarding_blocked_title">Blocked / Distractor Apps</string>
+    <string name="onboarding_blocked_subtitle">Select social apps that will consume your wallet and get blocked when empty.</string>
+    <string name="onboarding_search_apps_hint">Search installed apps…</string>
+    <string name="onboarding_filter_all">All (%1$d)</string>
+    <string name="onboarding_filter_chosen">Already Chosen (%1$d)</string>
+    <string name="onboarding_selected_count_limit">Selected %1$d / %2$d (Free Plan)</string>
+    <string name="onboarding_selected_count">Selected %1$d apps</string>
+    <string name="onboarding_excluded_blocked">Already chosen as Blocked App</string>
+    <string name="onboarding_excluded_productive">Already chosen as Target App</string>
+    <string name="onboarding_excluded_default">Already chosen in another category</string>
+    <string name="onboarding_empty_chosen">No apps have been chosen yet.</string>
+    <string name="onboarding_empty_search">No apps found matching \"%1$s\"</string>
+    <string name="onboarding_free_plan_limit_toast">Free plan allows up to %1$d apps per category. Upgrade to PRO for unlimited apps.</string>
+
+    <!-- Onboarding Step 4: Emergency Passphrase -->
+    <string name="onboarding_emergency_title">Emergency Passphrase</string>
+    <string name="onboarding_emergency_subtitle">Create a long emergency passphrase (at least 35 symbols). If you truly need urgent access when an app is blocked, typing this entire phrase will unblock it. Avoid repeating duplicate symbols.</string>
+    <string name="onboarding_emergency_input_label">Emergency Passphrase (min 35 symbols)</string>
+    <string name="onboarding_emergency_input_placeholder">e.g., I promise to stay focused on my learning goals today 2026!</string>
+    <string name="onboarding_emergency_hide">Hide passphrase</string>
+    <string name="onboarding_emergency_show">Show passphrase</string>
+    <string name="onboarding_emergency_valid">✓ Passphrase valid</string>
+    <string name="onboarding_emergency_chars_needed">Requires %1$d more chars</string>
+    <string name="onboarding_emergency_why_title">Why 35+ characters?</string>
+    <string name="onboarding_emergency_why_desc">A long sentence introduces intentional friction to break dopamine loops, while still guaranteeing you can never be permanently locked out.</string>
+
+    <!-- Onboarding Step 5: Permissions & Battery Optimization -->
+    <string name="onboarding_perm_title">Required Permissions</string>
+    <string name="onboarding_perm_subtitle">Unlockly needs system access to detect active study sessions, enforce application limits, and keep tracking alive in the background.</string>
+    <string name="onboarding_perm_battery_mandatory_notice">Disabling battery optimization is required to prevent Android from closing the background tracker.</string>
+    <string name="onboarding_perm_battery_required_badge">Required</string>
+    <string name="onboarding_perm_refresh">Refresh Permission Status</string>
+
+    <!-- Emergency Passphrase Recovery -->
+    <string name="forgot_emergency_passphrase">Forgot passphrase?</string>
+    <string name="emergency_recovery_title">Passphrase Recovery</string>
+    <string name="emergency_recovery_subtitle">Choose an intentional recovery method to protect your long-term focus habits.</string>
+    <string name="recovery_option_challenge_title">150-Character Challenge</string>
+    <string name="recovery_option_challenge_desc">Retype a mindfulness manifesto manually (copy-paste is blocked). Limited to once every 7 days.</string>
+    <string name="recovery_challenge_available">Available now (1x per week)</string>
+    <string name="recovery_challenge_cooldown">Available in %1$s</string>
+    <string name="recovery_option_timelock_title">24-Hour Cooling Timer</string>
+    <string name="recovery_option_timelock_desc">Start a 24-hour waiting period to break dopamine craving. When done, you can set a new passphrase without retyping.</string>
+    <string name="recovery_timelock_active_badge">Running: %1$s left</string>
+    <string name="recovery_timelock_ready_badge">Ready to reset now!</string>
+    <string name="recovery_start_timelock_btn">Start 24h Timer</string>
+    <string name="recovery_cancel_timelock_btn">Cancel Reset</string>
+    <string name="recovery_challenge_dialog_title">Mindfulness Manifesto</string>
+    <string name="recovery_challenge_instructions">Type the exact text below manually. Copy-paste is disabled to ensure mindful friction.</string>
+    <string name="recovery_challenge_manifesto_text">I consciously choose to take control of my time and focus, rather than letting algorithms dictate my life. I am resetting this password with full awareness.</string>
+    <string name="recovery_challenge_paste_blocked">Pasting is disabled. Please type the text manually.</string>
+    <string name="recovery_challenge_progress">%1$d / %2$d characters</string>
+    <string name="recovery_challenge_completed_btn">Continue to New Passphrase</string>
+    <string name="recovery_set_new_title">Set New Passphrase</string>
+    <string name="recovery_set_new_subtitle">Enter a new emergency passphrase with a minimum of 35 characters.</string>
+    <string name="recovery_set_new_confirm_btn">Save New Passphrase</string>
+    <string name="recovery_banner_active_title">Passphrase Reset in Progress</string>
+    <string name="recovery_banner_active_desc">24h cooling timer active. Unlocks in %1$s.</string>
+    <string name="recovery_banner_ready_title">Passphrase Reset Ready</string>
+    <string name="recovery_banner_ready_desc">24h cooling period has finished. Tap to set your new passphrase.</string>
+    <string name="recovery_banner_reset_btn">Set New Passphrase</string>
+    <string name="recovery_success_toast">Emergency passphrase updated successfully</string>
 </resources>

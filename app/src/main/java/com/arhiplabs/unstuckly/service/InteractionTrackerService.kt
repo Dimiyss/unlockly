@@ -10,6 +10,7 @@ import android.graphics.Rect
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 import com.arhiplabs.unstuckly.UnstucklyApplication
 import com.arhiplabs.unstuckly.domain.PipHelper
 import kotlinx.coroutines.CoroutineScope
@@ -84,11 +85,17 @@ class InteractionTrackerService : AccessibilityService() {
             AccessibilityEvent.TYPE_VIEW_SCROLLED,
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED,
             AccessibilityEvent.TYPE_TOUCH_INTERACTION_START -> {
-                if (!pkgName.isNullOrEmpty() && pkgName != currentPackage.value) {
-                    _currentPackage.value = pkgName
+                val resolvedPackage = if (!isIgnoredPackage(pkgName)) {
+                    pkgName
+                } else {
+                    detectActiveApplicationPackage()
+                }
+
+                if (!resolvedPackage.isNullOrEmpty() && !isIgnoredPackage(resolvedPackage) && resolvedPackage != currentPackage.value) {
+                    _currentPackage.value = resolvedPackage
                     serviceScope.launch {
                         try {
-                            UnstucklyApplication.instance.blockingCoordinator.evaluateForegroundPackage(pkgName)
+                            UnstucklyApplication.instance.blockingCoordinator.evaluateForegroundPackage(resolvedPackage)
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -96,6 +103,39 @@ class InteractionTrackerService : AccessibilityService() {
                 }
             }
         }
+    }
+
+    fun detectActiveApplicationPackage(): String? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                val windowList = windows
+                if (!windowList.isNullOrEmpty()) {
+                    for (window in windowList) {
+                        if (window.type == AccessibilityWindowInfo.TYPE_APPLICATION && (window.isFocused || window.isActive)) {
+                            val pkg = window.root?.packageName?.toString()
+                            if (!isIgnoredPackage(pkg)) {
+                                return pkg
+                            }
+                        }
+                    }
+                    for (window in windowList) {
+                        if (window.type == AccessibilityWindowInfo.TYPE_APPLICATION) {
+                            val pkg = window.root?.packageName?.toString()
+                            if (!isIgnoredPackage(pkg)) {
+                                return pkg
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        val rootPkg = rootInActiveWindow?.packageName?.toString()
+        if (!isIgnoredPackage(rootPkg)) {
+            return rootPkg
+        }
+        return null
     }
 
     fun detectPipPackage(): String? = detectPipWindowInfo()?.packageName
@@ -305,5 +345,24 @@ class InteractionTrackerService : AccessibilityService() {
 
         private val _currentPipPackage = MutableStateFlow<String?>(null)
         val currentPipPackage: StateFlow<String?> = _currentPipPackage.asStateFlow()
+
+        val IGNORED_SYSTEM_PACKAGES = setOf(
+            "com.android.systemui",
+            "android",
+            "com.google.android.inputmethod.latin",
+            "com.samsung.android.honeyboard",
+            "com.touchtype.swiftkey",
+            "com.android.permissioncontroller",
+            "com.google.android.permissioncontroller"
+        )
+
+        fun isIgnoredPackage(packageName: String?): Boolean {
+            if (packageName.isNullOrBlank()) return true
+            if (IGNORED_SYSTEM_PACKAGES.contains(packageName)) return true
+            if (packageName == "com.arhiplabs.unstuckly") return true
+            val lower = packageName.lowercase()
+            if (lower.contains("inputmethod") || lower.contains("keyboard")) return true
+            return false
+        }
     }
 }

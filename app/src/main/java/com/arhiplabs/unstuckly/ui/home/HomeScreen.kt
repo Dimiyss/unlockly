@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -73,6 +74,13 @@ fun HomeScreen(
     var passwordGateError by remember { mutableStateOf<String?>(null) }
     var showPreferencesDialog by remember { mutableStateOf(false) }
 
+    // Emergency Passphrase Recovery states
+    var showRecoveryOptionsDialog by remember { mutableStateOf(false) }
+    var showChallengeDialog by remember { mutableStateOf(false) }
+    var showSetNewPassphraseDialog by remember { mutableStateOf(false) }
+    var isCompletingTimeLockReset by remember { mutableStateOf(false) }
+    val recoveryState by app.emergencyRecoveryManager.recoveryState.collectAsState()
+
     val handleEditRulesRequest = {
         val stored = primaryRule?.emergencyPassword
         if (stored.isNullOrBlank()) {
@@ -96,64 +104,89 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
+                    modifier = Modifier.weight(1f, fill = false),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AppLogo(
-                        modifier = Modifier.height(46.dp)
+                        modifier = Modifier.height(42.dp)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.app_name),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground
-                            )
+                            ),
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
                             text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.tagline),
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
                     // Preferences (Theme & Language)
-                    IconButton(onClick = { showPreferencesDialog = true }) {
+                    IconButton(
+                        onClick = { showPreferencesDialog = true },
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.preferences_title),
-                            tint = PrimaryIndigo
+                            tint = PrimaryIndigo,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
                     // Store / PRO Button
-                    IconButton(onClick = onNavigateToStore) {
+                    IconButton(
+                        onClick = onNavigateToStore,
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.WorkspacePremium,
                             contentDescription = "Store & Power-Ups",
-                            tint = WarningAmber
+                            tint = WarningAmber,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    IconButton(onClick = onNavigateToHealth) {
+                    IconButton(
+                        onClick = onNavigateToHealth,
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = if (healthStatus.isFullyHealthy) Icons.Default.CheckCircle else Icons.Default.Warning,
                             contentDescription = "Health Status",
-                            tint = if (healthStatus.isFullyHealthy) SuccessGreen else WarningAmber
+                            tint = if (healthStatus.isFullyHealthy) SuccessGreen else WarningAmber,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
-                    IconButton(onClick = handleEditRulesRequest) {
+                    IconButton(
+                        onClick = handleEditRulesRequest,
+                        modifier = Modifier.size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit Rules",
-                            tint = PrimaryIndigo
+                            tint = PrimaryIndigo,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
@@ -168,6 +201,18 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Emergency TimeLock Reset Banner (if active or ready)
+            if (recoveryState.isTimeLockActive || recoveryState.isTimeLockReady) {
+                EmergencyTimeLockBanner(
+                    recoveryManager = app.emergencyRecoveryManager,
+                    onResetReadyClick = {
+                        isCompletingTimeLockReset = true
+                        showSetNewPassphraseDialog = true
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // Live Status Pill Banner
             LiveStatusBanner(
                 isAccruing = isAccruing,
@@ -346,6 +391,25 @@ fun HomeScreen(
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = {
+                                showPasswordGateDialog = false
+                                showRecoveryOptionsDialog = true
+                            }
+                        ) {
+                            Text(
+                                text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.forgot_emergency_passphrase),
+                                color = PrimaryIndigo,
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
+                    }
                 }
             },
             confirmButton = {
@@ -370,6 +434,57 @@ fun HomeScreen(
             dismissButton = {
                 TextButton(onClick = { showPasswordGateDialog = false }) {
                     Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        )
+    }
+
+    // Emergency Passphrase Recovery Dialogs
+    if (showRecoveryOptionsDialog) {
+        EmergencyResetOptionsDialog(
+            recoveryManager = app.emergencyRecoveryManager,
+            onDismissRequest = { showRecoveryOptionsDialog = false },
+            onStartChallenge = {
+                showChallengeDialog = true
+            },
+            onStartNewPasswordForTimeLock = {
+                isCompletingTimeLockReset = true
+                showSetNewPassphraseDialog = true
+            }
+        )
+    }
+
+    if (showChallengeDialog) {
+        TypingChallengeDialog(
+            onDismissRequest = { showChallengeDialog = false },
+            onChallengeCompleted = {
+                showChallengeDialog = false
+                isCompletingTimeLockReset = false
+                showSetNewPassphraseDialog = true
+            }
+        )
+    }
+
+    if (showSetNewPassphraseDialog) {
+        SetNewPassphraseDialog(
+            onDismissRequest = { showSetNewPassphraseDialog = false },
+            onPassphraseConfirmed = { newPassphrase ->
+                scope.launch {
+                    val success = if (isCompletingTimeLockReset) {
+                        app.emergencyRecoveryManager.completeTimeLockReset(newPassphrase)
+                    } else {
+                        app.emergencyRecoveryManager.completeChallengeReset(newPassphrase)
+                    }
+
+                    if (success) {
+                        showSetNewPassphraseDialog = false
+                        Toast.makeText(
+                            context,
+                            context.getString(com.arhiplabs.unstuckly.R.string.recovery_success_toast),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onNavigateToRuleEditor()
+                    }
                 }
             }
         )
@@ -550,64 +665,226 @@ fun LiveStatusBanner(
 
 @Composable
 fun WalletBalanceCard(wallet: Wallet) {
+    val isAvailable = wallet.availableSeconds > 0
+    val availableMinutes = wallet.availableSeconds / 60
+    val availableSecsRemainder = wallet.availableSeconds % 60
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(PrimaryIndigo.copy(alpha = 0.12f), Color.Transparent)
+                        colors = listOf(
+                            if (isAvailable) PrimaryIndigo.copy(alpha = 0.14f) else WarningAmber.copy(alpha = 0.08f),
+                            Color.Transparent
+                        )
                     )
                 )
-                .padding(28.dp),
-            contentAlignment = Alignment.Center
+                .padding(20.dp)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.AccountBalanceWallet,
-                    contentDescription = null,
-                    tint = PrimaryIndigo,
-                    modifier = Modifier.size(36.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.wallet_balance_title),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                val formattedTime = formatSeconds(wallet.availableSeconds)
-                Text(
-                    text = formattedTime,
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 36.sp
+            // Header Row: "Доступно зараз" + Info Icon
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.time_available_now),
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                val subtitle = when {
-                    wallet.isUnfrozen -> androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.wallet_status_unfrozen)
-                    wallet.availableSeconds > 0 -> androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.wallet_status_unlocked)
-                    else -> androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.wallet_status_empty)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
 
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        color = if (wallet.isUnfrozen) Color(0xFF38BDF8) else if (wallet.availableSeconds > 0) SuccessGreen else ErrorRose,
-                        fontWeight = FontWeight.Bold
+                if (wallet.isUnfrozen) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFF38BDF8).copy(alpha = 0.18f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = "❄️ Unfrozen",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = Color(0xFF38BDF8),
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Big numbers display
+            if (isAvailable || wallet.isUnfrozen) {
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = if (availableMinutes > 0) "$availableMinutes" else "$availableSecsRemainder",
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 44.sp,
+                            lineHeight = 46.sp
+                        )
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (availableMinutes > 0) androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.minutes_unit) else "s",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.social_time_available),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            } else {
+                // Call To Action when wallet is empty: "Час навчання"
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "0",
+                            style = MaterialTheme.typography.displayMedium.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                fontSize = 42.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.minutes_unit),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Prominent CTA Banner
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(PrimaryIndigo.copy(alpha = 0.18f), SecondaryPurple.copy(alpha = 0.12f))
+                                ),
+                                RoundedCornerShape(14.dp)
+                            )
+                            .padding(14.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .background(PrimaryIndigo, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.School,
+                                    contentDescription = null,
+                                    tint = PureWhite,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.time_to_study_title),
+                                    style = MaterialTheme.typography.titleSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                                Text(
+                                    text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.time_to_study_desc),
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Focus benefit hint pill banner
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(SuccessGreen.copy(alpha = 0.18f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Eco,
+                            contentDescription = null,
+                            tint = SuccessGreen,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.focus_benefit_hint),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
+
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
@@ -619,24 +896,39 @@ fun StorePromoCard(
     wallet: Wallet,
     onClick: () -> Unit
 ) {
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+
+    val cardBorder = if (isDark) {
+        BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.35f))
+    } else {
+        BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.20f))
+    }
+
+    val gradientColors = if (isDark) {
+        listOf(
+            Color(0xFFF59E0B).copy(alpha = 0.15f),
+            Color(0xFF141923),
+            Color.Transparent
+        )
+    } else {
+        listOf(
+            Color(0xFFFEF3C7).copy(alpha = 0.50f),
+            Color(0xFFFFFBEB).copy(alpha = 0.25f),
+            Color.Transparent
+        )
+    }
+
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)),
+        shape = RoundedCornerShape(22.dp),
+        border = cardBorder,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth()
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            PrimaryIndigo.copy(alpha = 0.12f),
-                            Color.Transparent
-                        )
-                    )
-                )
+                .background(Brush.horizontalGradient(colors = gradientColors))
                 .padding(18.dp)
         ) {
             Row(
@@ -649,16 +941,20 @@ fun StorePromoCard(
                         modifier = Modifier
                             .size(44.dp)
                             .background(
-                                Brush.linearGradient(listOf(Color(0xFFF59E0B), Color(0xFFFBBF24))),
+                                if (isDark) {
+                                    Brush.linearGradient(listOf(Color(0xFFF59E0B), Color(0xFFD97706)))
+                                } else {
+                                    Brush.linearGradient(listOf(Color(0xFFF59E0B).copy(alpha = 0.14f), Color(0xFFF59E0B).copy(alpha = 0.08f)))
+                                },
                                 RoundedCornerShape(12.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Bolt,
+                            imageVector = Icons.Default.WorkspacePremium,
                             contentDescription = null,
-                            tint = Color(0xFF0F172A),
-                            modifier = Modifier.size(28.dp)
+                            tint = if (isDark) Color(0xFF0F172A) else Color(0xFFD97706),
+                            modifier = Modifier.size(26.dp)
                         )
                     }
 
@@ -667,7 +963,7 @@ fun StorePromoCard(
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.store_promo_title),
+                                text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.pro_badge_title),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.titleMedium
@@ -676,15 +972,23 @@ fun StorePromoCard(
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Box(
                                     modifier = Modifier
-                                        .background(WarningAmber, RoundedCornerShape(4.dp))
-                                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                                        .background(
+                                            if (isDark) Color(0xFFF59E0B) else Color(0xFFF59E0B).copy(alpha = 0.18f),
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                        .padding(horizontal = 5.dp, vertical = 2.dp)
                                 ) {
-                                    Text("PRO", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0F172A))
+                                    Text(
+                                        text = "PRO",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (isDark) Color(0xFF0F172A) else Color(0xFFB45309)
+                                    )
                                 }
                             }
                         }
                         Text(
-                            text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.store_promo_desc),
+                            text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.pro_badge_desc),
                             style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                             modifier = Modifier.padding(top = 2.dp)
                         )
@@ -693,15 +997,18 @@ fun StorePromoCard(
 
                 Button(
                     onClick = onClick,
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDark) Color(0xFFF59E0B) else Color(0xFFF59E0B).copy(alpha = 0.14f),
+                        contentColor = if (isDark) Color(0xFF0F172A) else Color(0xFFB45309)
+                    ),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.btn_buy),
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.btn_get_pro),
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
-                        color = Color.White
+                        color = if (isDark) Color(0xFF0F172A) else Color(0xFFB45309)
                     )
                 }
             }
@@ -723,35 +1030,42 @@ fun InitialStudyTargetCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            SecondaryPurple.copy(alpha = 0.08f),
+                            Color.Transparent
+                        )
+                    )
+                )
+                .padding(20.dp)
         ) {
+            // Header with target icon and title
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(38.dp)
                         .background(
-                            if (isCompleted) SuccessGreen.copy(alpha = 0.15f) else WarningAmber.copy(alpha = 0.15f),
-                            RoundedCornerShape(10.dp)
+                            PrimaryIndigo.copy(alpha = 0.16f),
+                            RoundedCornerShape(12.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (isCompleted) Icons.Default.CheckCircle else Icons.Default.School,
+                        imageVector = Icons.Default.TrackChanges,
                         contentDescription = null,
-                        tint = if (isCompleted) SuccessGreen else WarningAmber,
-                        modifier = Modifier.size(20.dp)
+                        tint = PrimaryIndigo,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
 
@@ -759,7 +1073,7 @@ fun InitialStudyTargetCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.initial_study_target_title),
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.next_focus_session_title),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -774,58 +1088,82 @@ fun InitialStudyTargetCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
+            // Big duration display
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "$targetMinutes ${androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.minutes_unit)}",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+
+                Text(
+                    text = "${formatSecondsShort(studiedSeconds)} / ${targetMinutes}m",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             // Progress Bar
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp)),
                 color = if (isCompleted) SuccessGreen else PrimaryIndigo,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_required, formatSecondsShort(studiedSeconds), targetMinutes.toString()),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = if (isCompleted) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                )
-
-                Text(
-                    text = if (isCompleted) androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_reward_credited, rewardMinutes.toString()) else androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_reward_allowance, rewardMinutes.toString()),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = PrimaryIndigo,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Horizontal Status Badge at the bottom of the card
+            // Reward tag & completion status
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        if (isCompleted) SuccessGreen.copy(alpha = 0.15f) else ErrorRose.copy(alpha = 0.15f),
-                        RoundedCornerShape(10.dp)
+                        if (isCompleted) SuccessGreen.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        RoundedCornerShape(12.dp)
                     )
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                Row(
+                    modifier = Modifier.weight(1f, fill = false),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = SuccessGreen,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "${androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.after_session_available)} +${rewardMinutes}m",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            color = SuccessGreen
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
                     text = if (isCompleted) androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_unlocked_badge) else androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_locked_badge),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = if (isCompleted) SuccessGreen else ErrorRose,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = if (isCompleted) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -836,33 +1174,71 @@ fun InitialStudyTargetCard(
 
 @Composable
 fun DailyMetricsRow(studiedSeconds: Long, earnedSeconds: Long, spentSeconds: Long) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        MetricCard(
-            title = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.metric_studied),
-            value = formatSecondsShort(studiedSeconds),
-            icon = Icons.Default.School,
-            iconTint = PrimaryIndigo,
-            modifier = Modifier.weight(1f)
-        )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.CalendarToday,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.today_title),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
 
-        MetricCard(
-            title = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.metric_earned),
-            value = formatSecondsShort(earnedSeconds),
-            icon = Icons.Default.ArrowUpward,
-            iconTint = SuccessGreen,
-            modifier = Modifier.weight(1f)
-        )
+            Text(
+                text = "${androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.details_link)} ›",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+        }
 
-        MetricCard(
-            title = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.metric_spent),
-            value = formatSecondsShort(spentSeconds),
-            icon = Icons.Default.ArrowDownward,
-            iconTint = ErrorRose,
-            modifier = Modifier.weight(1f)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            MetricCard(
+                title = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.metric_studied),
+                value = formatSecondsShort(studiedSeconds),
+                icon = Icons.Default.School,
+                iconTint = PrimaryIndigo,
+                containerTint = PrimaryIndigo.copy(alpha = 0.12f),
+                modifier = Modifier.weight(1f)
+            )
+
+            MetricCard(
+                title = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.metric_earned),
+                value = formatSecondsShort(earnedSeconds),
+                icon = Icons.Default.WbSunny,
+                iconTint = SuccessGreen,
+                containerTint = SuccessGreen.copy(alpha = 0.12f),
+                modifier = Modifier.weight(1f)
+            )
+
+            MetricCard(
+                title = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.used_today),
+                value = formatSecondsShort(spentSeconds),
+                icon = Icons.Default.Schedule,
+                iconTint = WarningAmber,
+                containerTint = WarningAmber.copy(alpha = 0.12f),
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 
@@ -872,31 +1248,42 @@ fun MetricCard(
     value: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     iconTint: Color,
+    containerTint: Color = MaterialTheme.colorScheme.surfaceVariant,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)),
+        shape = RoundedCornerShape(18.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(15.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 11.sp
-                    ),
-                    maxLines = 1
-                )
+        Column(modifier = Modifier.padding(14.dp)) {
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .background(containerTint, RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp))
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 18.sp
+                )
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 11.sp
+                ),
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
         }
     }
@@ -984,5 +1371,11 @@ fun formatSeconds(totalSeconds: Long): String {
 
 fun formatSecondsShort(totalSeconds: Long): String {
     val minutes = totalSeconds / 60
-    return "${minutes}m"
+    val seconds = totalSeconds % 60
+    return when {
+        totalSeconds <= 0L -> "0m"
+        totalSeconds < 60L -> "${seconds}s"
+        seconds == 0L -> "${minutes}m"
+        else -> "${minutes}m ${seconds}s"
+    }
 }

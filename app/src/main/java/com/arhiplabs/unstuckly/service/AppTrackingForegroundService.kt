@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -19,6 +20,7 @@ class AppTrackingForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val foregroundTracker by lazy { ForegroundTracker(this) }
     private val powerManager by lazy { getSystemService(Context.POWER_SERVICE) as PowerManager }
+    private val audioManager by lazy { getSystemService(Context.AUDIO_SERVICE) as? AudioManager }
 
     private var trackingJob: Job? = null
 
@@ -41,11 +43,22 @@ class AppTrackingForegroundService : Service() {
                 try {
                     val isInteractive = powerManager.isInteractive
                     var currentPkg = InteractionTrackerService.currentPackage.value
-                    if (currentPkg.isEmpty()) {
-                        currentPkg = foregroundTracker.getForegroundPackageName()
+                    if (currentPkg.isEmpty() || InteractionTrackerService.isIgnoredPackage(currentPkg)) {
+                        val activeApp = InteractionTrackerService.instance?.detectActiveApplicationPackage()
+                        if (!activeApp.isNullOrEmpty() && !InteractionTrackerService.isIgnoredPackage(activeApp)) {
+                            currentPkg = activeApp
+                        } else {
+                            currentPkg = foregroundTracker.getForegroundPackageName()
+                        }
                     }
 
-                    if (currentPkg.isNotEmpty()) {
+                    // Keep interaction heartbeat alive if audio is actively playing or speech is active
+                    val isAudioActive = audioManager?.isMusicActive == true || (audioManager?.mode ?: AudioManager.MODE_NORMAL) != AudioManager.MODE_NORMAL
+                    if (isAudioActive && currentPkg.isNotEmpty() && !InteractionTrackerService.isIgnoredPackage(currentPkg)) {
+                        InteractionTrackerService.updateLastInteractionTimestamp()
+                    }
+
+                    if (currentPkg.isNotEmpty() && !InteractionTrackerService.isIgnoredPackage(currentPkg)) {
                         app.earnSessionManager.tick(currentPkg, isInteractive)
                         app.blockingCoordinator.evaluateForegroundPackage(currentPkg)
                     }

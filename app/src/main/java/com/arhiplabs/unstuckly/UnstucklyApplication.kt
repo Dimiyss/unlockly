@@ -7,6 +7,7 @@ import com.arhiplabs.unstuckly.data.repository.WalletRepository
 import com.arhiplabs.unstuckly.domain.EarnSessionManager
 import com.arhiplabs.unstuckly.domain.WalletManager
 import com.arhiplabs.unstuckly.domain.BlockingCoordinator
+import com.arhiplabs.unstuckly.domain.EmergencyRecoveryManager
 import com.arhiplabs.unstuckly.domain.HealthMonitor
 import com.arhiplabs.unstuckly.worker.MidnightResetWorker
 
@@ -20,6 +21,7 @@ class UnstucklyApplication : Application() {
     val earnSessionManager by lazy { EarnSessionManager(walletManager, ruleRepository) }
     val blockingCoordinator by lazy { BlockingCoordinator(this, walletManager, ruleRepository) }
     val healthMonitor by lazy { HealthMonitor(this) }
+    val emergencyRecoveryManager by lazy { EmergencyRecoveryManager(this, ruleRepository) }
 
     override fun onCreate() {
         super.onCreate()
