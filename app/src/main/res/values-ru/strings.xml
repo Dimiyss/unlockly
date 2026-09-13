@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">Unstuckly использует Специальные возможности для фиксации активности во время продуктивного обучения и контроля лимитов соцсетей.</string>
-    <string name="tagline">Зарабатывай экранное время</string>
+    <string name="tagline">Раскрой свой потенциал</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Настройки</string>
@@ -55,6 +55,20 @@
     <string name="wallet_status_empty">Кошелёк пуст — учитесь для разблокировки</string>
     <string name="wallet_status_unlocked">Соцсети разблокированы</string>
     <string name="wallet_status_unfrozen">❄️ Пропуск разморозки активен — приложения разблокированы</string>
+
+    <string name="time_available_now">Доступно сейчас</string>
+    <string name="social_time_available">свободного времени для соцсетей</string>
+    <string name="time_to_study_title">Время учиться</string>
+    <string name="time_to_study_desc">Откройте учебное приложение, чтобы заработать время для соцсетей</string>
+    <string name="focus_benefit_hint">Больше фокуса — больше времени для того, что ты любишь</string>
+    <string name="next_focus_session_title">Цель фокус-сессии</string>
+    <string name="after_session_available">После сессии будет доступно:</string>
+    <string name="today_title">Сегодня</string>
+    <string name="details_link">Детали</string>
+    <string name="used_today">использовано сегодня</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">Больше контроля, меньше усилий</string>
+    <string name="btn_get_pro">Купить PRO</string>
 
     <string name="initial_study_target_title">Начальная цель учебы</string>
     <string name="initial_study_target_desc">Минимум учебы перед открытием соцсетей</string>

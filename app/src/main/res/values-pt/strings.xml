@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">O Unstuckly utiliza o Serviço de Acessibilidade para monitorar o tempo de estudo produtivo e impor limites a aplicativos sociais.</string>
-    <string name="tagline">Ganhe tempo de tela</string>
+    <string name="tagline">Desbloqueie seu potencial</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Preferências</string>
@@ -55,6 +55,20 @@
     <string name="wallet_status_empty">Carteira vazia - estude para desbloquear</string>
     <string name="wallet_status_unlocked">Apps sociais liberados</string>
     <string name="wallet_status_unfrozen">❄️ Passe ativo — apps liberados</string>
+
+    <string name="time_available_now">Disponível agora</string>
+    <string name="social_time_available">tempo livre para redes sociais</string>
+    <string name="time_to_study_title">Hora de estudar</string>
+    <string name="time_to_study_desc">Abra um app de estudo para ganhar tempo para redes sociais</string>
+    <string name="focus_benefit_hint">Mais foco — mais tempo para o que você ama</string>
+    <string name="next_focus_session_title">Meta da sessão de foco</string>
+    <string name="after_session_available">Disponível após a sessão:</string>
+    <string name="today_title">Hoje</string>
+    <string name="details_link">Detalhes</string>
+    <string name="used_today">usado hoje</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">Mais controle, menos esforço</string>
+    <string name="btn_get_pro">Obter PRO</string>
 
     <string name="initial_study_target_title">Meta de Estudo Inicial</string>
     <string name="initial_study_target_desc">Requisito mínimo antes de liberar apps sociais</string>

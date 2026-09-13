@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">Unstuckly використовує Спеціальні можливості для фіксації активності під час продуктивного навчання та контролю лімітів соцмереж.</string>
-    <string name="tagline">Заробляй екранний час</string>
+    <string name="tagline">Розкрий свій потенціал</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Налаштування</string>
@@ -55,6 +55,20 @@
     <string name="wallet_status_empty">Гаманець порожній — вчіться для розблокування</string>
     <string name="wallet_status_unlocked">Соцмережі розблоковано</string>
     <string name="wallet_status_unfrozen">❄️ Пароль розмороження активний</string>
+
+    <string name="time_available_now">Доступно зараз</string>
+    <string name="social_time_available">вільного часу для соцмереж</string>
+    <string name="time_to_study_title">Час навчання</string>
+    <string name="time_to_study_desc">Відкрийте навчальний додаток, щоб заробити час для соцмереж</string>
+    <string name="focus_benefit_hint">Більше фокусу — більше часу для того, що ти любиш</string>
+    <string name="next_focus_session_title">Ціль фокус-сесії</string>
+    <string name="after_session_available">Після сесії буде доступно:</string>
+    <string name="today_title">Сьогодні</string>
+    <string name="details_link">Деталі</string>
+    <string name="used_today">Використано сьогодні</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">Більше контролю, менше зусиль</string>
+    <string name="btn_get_pro">Придбати PRO</string>
 
     <string name="initial_study_target_title">Початкова ціль навчання</string>
     <string name="initial_study_target_desc">Мінімум навчання перед відкриттям соцмереж</string>

@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">Unstuckly uses Accessibility Service to track active engagement during productive app study sessions and enforce social app limits.</string>
-    <string name="tagline">Earn Social Time</string>
+    <string name="tagline">Unlock your potential</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Preferences</string>
@@ -56,6 +56,20 @@
     <string name="wallet_status_unlocked">Social apps unlocked</string>
     <string name="wallet_status_unfrozen">❄️ Unfreeze pass active — apps unblocked</string>
 
+    <string name="time_available_now">Available now</string>
+    <string name="social_time_available">Social Media Time</string>
+    <string name="time_to_study_title">Time to Focus</string>
+    <string name="time_to_study_desc">Open a Study app to finish your study session</string>
+    <string name="focus_benefit_hint">More focus — more time for what you love</string>
+    <string name="next_focus_session_title">Focus session target</string>
+    <string name="after_session_available">After session you\'ll get:</string>
+    <string name="today_title">Today</string>
+    <string name="details_link">Details</string>
+    <string name="used_today">Used Today</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">More control, less effort</string>
+    <string name="btn_get_pro">Get PRO</string>
+
     <string name="initial_study_target_title">Initial Study Target</string>
     <string name="initial_study_target_desc">Minimum requirement before social apps unlock</string>
     <string name="initial_study_target_met">Target met • %1$s studied today</string>
@@ -66,7 +80,7 @@
     <string name="target_reward_credited">+%1$sm reward credited</string>
 
     <string name="metric_studied">Studied</string>
-    <string name="metric_earned">Earned</string>
+    <string name="metric_earned">Social Time</string>
     <string name="metric_spent">Spent</string>
 
     <string name="store_promo_title">Store &amp; Power-Ups</string>

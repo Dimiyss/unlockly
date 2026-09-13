@@ -5,8 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
-// Static Base Palette Tokens
-val Slate900 = Color(0xFF0F172A)
+// Static Base Palette Tokens (Modern Obsidian / Deep Dark)
+val Slate950 = Color(0xFF0A0D14)
+val Slate900 = Color(0xFF141923)
+val Slate850 = Color(0xFF1A2232)
 val Slate800 = Color(0xFF1E293B)
 val Slate700 = Color(0xFF334155)
 val Slate600 = Color(0xFF475569)
@@ -16,13 +18,13 @@ val Slate50 = Color(0xFFF8FAFC)
 val PureWhite = Color(0xFFFFFFFF)
 
 // Static tokens used when configuring ColorScheme
-val DarkBackground = Slate900
-val DarkSurface = Slate800
-val DarkSurfaceVariant = Slate700
-val DarkTextPrimary = Slate50
-val DarkTextSecondary = Slate400
+val DarkBackground = Color(0xFF0A0D14)
+val DarkSurface = Color(0xFF141923)
+val DarkSurfaceVariant = Color(0xFF1A2232)
+val DarkTextPrimary = Color(0xFFF8FAFC)
+val DarkTextSecondary = Color(0xFF94A3B8)
 val DarkTextMuted = Color(0xFF64748B)
-val DarkOutline = Slate700
+val DarkOutline = Color(0xFF242B3B)
 
 val LightBackground = Slate50
 val LightSurface = PureWhite
@@ -34,11 +36,15 @@ val LightOutline = Color(0xFFE2E8F0)
 
 // Vibrant Brand Accents
 val PrimaryIndigo = Color(0xFF6366F1)
-val SecondaryPurple = Color(0xFFA855F7)
+val SecondaryPurple = Color(0xFF8B5CF6)
 val AccentPink = Color(0xFFEC4899)
 val SuccessGreen = Color(0xFF10B981)
 val WarningAmber = Color(0xFFF59E0B)
 val ErrorRose = Color(0xFFF43F5E)
+val GoldPro = Color(0xFFF59E0B)
+val GoldProDark = Color(0xFFD97706)
+val MintGreen = Color(0xFF10B981)
+val DarkCardBorder = Color(0xFF242B3B)
 
 // Dynamic theme-aware accessors for seamless light/dark mode support
 val BackgroundDark: Color

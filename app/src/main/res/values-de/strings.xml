@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Unstuckly</string>
     <string name="accessibility_service_description">Unstuckly nutzt den Barrierefreiheitsdienst, um die aktive Nutzung während produktiver Lernsitzungen zu erfassen und Limits für soziale Apps durchzusetzen.</string>
-    <string name="tagline">Verdiene soziale Bildschirmzeit</string>
+    <string name="tagline">Entfalte dein Potenzial</string>
 
     <!-- Theme & Preferences -->
     <string name="preferences_title">Einstellungen</string>
@@ -55,6 +55,20 @@
     <string name="wallet_status_empty">Wallet leer - Lerne zum Freischalten</string>
     <string name="wallet_status_unlocked">Social Apps freigeschaltet</string>
     <string name="wallet_status_unfrozen">❄️ Unfreeze aktiv — Apps freigegeben</string>
+
+    <string name="time_available_now">Jetzt verfügbar</string>
+    <string name="social_time_available">Freizeit für soziale Medien</string>
+    <string name="time_to_study_title">Zeit zu lernen</string>
+    <string name="time_to_study_desc">Öffne eine Lern-App, um Zeit für soziale Medien zu verdienen</string>
+    <string name="focus_benefit_hint">Mehr Fokus — mehr Zeit für das, was du liebst</string>
+    <string name="next_focus_session_title">Ziel der Fokus-Sitzung</string>
+    <string name="after_session_available">Nach der Sitzung verfügbar:</string>
+    <string name="today_title">Heute</string>
+    <string name="details_link">Details</string>
+    <string name="used_today">heute verbraucht</string>
+    <string name="pro_badge_title">Unstuckly PRO</string>
+    <string name="pro_badge_desc">Mehr Kontrolle, weniger Aufwand</string>
+    <string name="btn_get_pro">PRO holen</string>
 
     <string name="initial_study_target_title">Erstes Lernziel</string>
     <string name="initial_study_target_desc">Mindestanforderung vor Freischaltung sozialer Apps</string>
