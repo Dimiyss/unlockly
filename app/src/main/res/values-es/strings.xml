@@ -62,7 +62,7 @@
     <string name="time_to_study_desc">Abre una app de estudio para ganar tiempo en redes sociales</string>
     <string name="focus_benefit_hint">Más enfoque — más tiempo para lo que amas</string>
     <string name="next_focus_session_title">Meta de sesión de enfoque</string>
-    <string name="after_session_available">Disponible tras la sesión:</string>
+    <string name="after_session_available">Tras la sesión:</string>
     <string name="today_title">Hoy</string>
     <string name="details_link">Detalles</string>
     <string name="used_today">usado hoy</string>
@@ -73,8 +73,8 @@
     <string name="initial_study_target_title">Meta de Estudio Inicial</string>
     <string name="initial_study_target_desc">Requisito mínimo antes de desbloquear redes sociales</string>
     <string name="initial_study_target_met">Meta cumplida • %1$s estudiado hoy</string>
-    <string name="target_unlocked_badge">✅ Desbloqueado</string>
-    <string name="target_locked_badge">🔒 Bloqueado</string>
+    <string name="target_unlocked_badge">🔓</string>
+    <string name="target_locked_badge">🔒</string>
     <string name="target_required">%1$s / %2$sm requeridos</string>
     <string name="target_reward_allowance">Recompensa: +%1$sm de saldo</string>
     <string name="target_reward_credited">+%1$sm recompensa acreditada</string>
@@ -220,4 +220,34 @@
     <string name="onboarding_perm_battery_mandatory_notice">Desactivar la optimización de batería es obligatorio para evitar que Android detenga el servicio.</string>
     <string name="onboarding_perm_battery_required_badge">Requerido</string>
     <string name="onboarding_perm_refresh">Actualizar estado de permisos</string>
+
+    <!-- Emergency Passphrase Recovery -->
+    <string name="forgot_emergency_passphrase">¿Olvidaste la frase?</string>
+    <string name="emergency_recovery_title">Recuperación de contraseña</string>
+    <string name="emergency_recovery_subtitle">Elige un método consciente de recuperación para proteger tus hábitos de enfoque.</string>
+    <string name="recovery_option_challenge_title">Desafío de 150 caracteres</string>
+    <string name="recovery_option_challenge_desc">Escribe a mano un manifiesto de atención plena (pegar bloqueado). Disponible una vez cada 7 días.</string>
+    <string name="recovery_challenge_available">Disponible ahora (1x por semana)</string>
+    <string name="recovery_challenge_cooldown">Disponible en %1$s</string>
+    <string name="recovery_option_timelock_title">Temporizador de espera de 24 horas</string>
+    <string name="recovery_option_timelock_desc">Inicia una espera de 24 horas. Al terminar, podrás definir una nueva frase sin escribir el manifiesto.</string>
+    <string name="recovery_timelock_active_badge">En curso: quedan %1$s</string>
+    <string name="recovery_timelock_ready_badge">¡Listo para restablecer!</string>
+    <string name="recovery_start_timelock_btn">Iniciar temporizador 24h</string>
+    <string name="recovery_cancel_timelock_btn">Cancelar restablecimiento</string>
+    <string name="recovery_challenge_dialog_title">Manifiesto de atención plena</string>
+    <string name="recovery_challenge_instructions">Escribe exactamente el texto a continuación. Pegar está deshabilitado para garantizar un esfuerzo consciente.</string>
+    <string name="recovery_challenge_manifesto_text">Elijo conscientemente tomar el control de mi tiempo y atención en lugar de que los algoritmos decidan por mí. Restablezco esta clave con plena responsabilidad.</string>
+    <string name="recovery_challenge_paste_blocked">Pegar está bloqueado. Por favor escribe manualmente.</string>
+    <string name="recovery_challenge_progress">%1$d / %2$d caracteres</string>
+    <string name="recovery_challenge_completed_btn">Continuar a nueva frase</string>
+    <string name="recovery_set_new_title">Establecer nueva frase</string>
+    <string name="recovery_set_new_subtitle">Introduce una nueva frase de emergencia de al menos 35 caracteres.</string>
+    <string name="recovery_set_new_confirm_btn">Guardar nueva frase</string>
+    <string name="recovery_banner_active_title">Restablecimiento en progreso</string>
+    <string name="recovery_banner_active_desc">Temporizador de 24h activo. Se desbloquea en %1$s.</string>
+    <string name="recovery_banner_ready_title">Restablecimiento listo</string>
+    <string name="recovery_banner_ready_desc">Han pasado 24 horas. Pulsa para establecer tu nueva frase.</string>
+    <string name="recovery_banner_reset_btn">Establecer nueva frase</string>
+    <string name="recovery_success_toast">Frase de emergencia actualizada correctamente</string>
 </resources>

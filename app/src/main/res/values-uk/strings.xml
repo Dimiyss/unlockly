@@ -62,7 +62,7 @@
     <string name="time_to_study_desc">Відкрийте навчальний додаток, щоб заробити час для соцмереж</string>
     <string name="focus_benefit_hint">Більше фокусу — більше часу для того, що ти любиш</string>
     <string name="next_focus_session_title">Ціль фокус-сесії</string>
-    <string name="after_session_available">Після сесії буде доступно:</string>
+    <string name="after_session_available">Після сесії буде</string>
     <string name="today_title">Сьогодні</string>
     <string name="details_link">Деталі</string>
     <string name="used_today">Використано сьогодні</string>
@@ -73,8 +73,8 @@
     <string name="initial_study_target_title">Початкова ціль навчання</string>
     <string name="initial_study_target_desc">Мінімум навчання перед відкриттям соцмереж</string>
     <string name="initial_study_target_met">Ціль виконано • пройдено %1$s сьогодні</string>
-    <string name="target_unlocked_badge">✅ Розблоковано</string>
-    <string name="target_locked_badge">🔒 Заблоковано</string>
+    <string name="target_unlocked_badge">🔓</string>
+    <string name="target_locked_badge">🔒</string>
     <string name="target_required">Потрібно %1$s з %2$s хв</string>
     <string name="target_reward_allowance">Винагорода: +%1$s хв доступу</string>
     <string name="target_reward_credited">+%1$s хв винагороди нараховано</string>
@@ -220,4 +220,34 @@
     <string name="onboarding_perm_battery_mandatory_notice">Вимкнення оптимізації батареї обов\'язкове для безперервної роботи фонового трекера.</string>
     <string name="onboarding_perm_battery_required_badge">Обов\'язково</string>
     <string name="onboarding_perm_refresh">Оновити статус дозволів</string>
+
+    <!-- Emergency Passphrase Recovery -->
+    <string name="forgot_emergency_passphrase">Забули пароль?</string>
+    <string name="emergency_recovery_title">Відновлення пароля</string>
+    <string name="emergency_recovery_subtitle">Оберіть усвідомлений спосіб відновлення без шкоди для вашої цифрової дисципліни.</string>
+    <string name="recovery_option_challenge_title">Челендж на 150 символів</string>
+    <string name="recovery_option_challenge_desc">Передрук маніфесту усвідомленості вручну (копіювання вимкнено). Доступно 1 раз на 7 днів.</string>
+    <string name="recovery_challenge_available">Доступно зараз (1р / тиждень)</string>
+    <string name="recovery_challenge_cooldown">Буде доступно через %1$s</string>
+    <string name="recovery_option_timelock_title">24-годинний таймер очікування</string>
+    <string name="recovery_option_timelock_desc">Запустіть 24-годинний період охолодження. Після завершення ви зможете встановити новий пароль без передруку.</string>
+    <string name="recovery_timelock_active_badge">Активно: залишилось %1$s</string>
+    <string name="recovery_timelock_ready_badge">Готово! Можна встановити пароль</string>
+    <string name="recovery_start_timelock_btn">Запустити 24г таймер</string>
+    <string name="recovery_cancel_timelock_btn">Скасувати скидання</string>
+    <string name="recovery_challenge_dialog_title">Маніфест усвідомленості</string>
+    <string name="recovery_challenge_instructions">Введіть точний текст нижче вручну. Вставка з буфера заблокована для усвідомленого зусилля.</string>
+    <string name="recovery_challenge_manifesto_text">Я усвідомлено обираю керувати своїм часом та увагою, а не дозволяти алгоритмам керувати моїм життям. Я відновлюю цей пароль відповідально для власних цілей.</string>
+    <string name="recovery_challenge_paste_blocked">Вставка заборонена. Будь ласка, вводьте текст вручну.</string>
+    <string name="recovery_challenge_progress">%1$d / %2$d символів</string>
+    <string name="recovery_challenge_completed_btn">Перейти до нового пароля</string>
+    <string name="recovery_set_new_title">Встановіть новий пароль</string>
+    <string name="recovery_set_new_subtitle">Введіть нову екстрену парольну фразу (від 35 символів).</string>
+    <string name="recovery_set_new_confirm_btn">Зберегти новий пароль</string>
+    <string name="recovery_banner_active_title">Триває скидання пароля</string>
+    <string name="recovery_banner_active_desc">24г таймер охолодження активний. Розблокується через %1$s.</string>
+    <string name="recovery_banner_ready_title">Скидання пароля готове</string>
+    <string name="recovery_banner_ready_desc">24 години минули. Натисніть, щоб встановити новий емерженсі пароль.</string>
+    <string name="recovery_banner_reset_btn">Встановити новий пароль</string>
+    <string name="recovery_success_toast">Екстрений пароль успішно оновлено</string>
 </resources>

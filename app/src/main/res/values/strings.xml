@@ -62,7 +62,7 @@
     <string name="time_to_study_desc">Open a Study app to finish your study session</string>
     <string name="focus_benefit_hint">More focus — more time for what you love</string>
     <string name="next_focus_session_title">Focus session target</string>
-    <string name="after_session_available">After session you\'ll get:</string>
+    <string name="after_session_available">After session:</string>
     <string name="today_title">Today</string>
     <string name="details_link">Details</string>
     <string name="used_today">Used Today</string>
@@ -73,8 +73,8 @@
     <string name="initial_study_target_title">Initial Study Target</string>
     <string name="initial_study_target_desc">Minimum requirement before social apps unlock</string>
     <string name="initial_study_target_met">Target met • %1$s studied today</string>
-    <string name="target_unlocked_badge">✅ Unlocked</string>
-    <string name="target_locked_badge">🔒 Locked</string>
+    <string name="target_unlocked_badge">🔓</string>
+    <string name="target_locked_badge">🔒</string>
     <string name="target_required">%1$s / %2$sm required</string>
     <string name="target_reward_allowance">Reward: +%1$sm allowance</string>
     <string name="target_reward_credited">+%1$sm reward credited</string>
@@ -220,4 +220,34 @@
     <string name="onboarding_perm_battery_mandatory_notice">Disabling battery optimization is required to prevent Android from closing the background tracker.</string>
     <string name="onboarding_perm_battery_required_badge">Required</string>
     <string name="onboarding_perm_refresh">Refresh Permission Status</string>
+
+    <!-- Emergency Passphrase Recovery -->
+    <string name="forgot_emergency_passphrase">Forgot passphrase?</string>
+    <string name="emergency_recovery_title">Passphrase Recovery</string>
+    <string name="emergency_recovery_subtitle">Choose an intentional recovery method to protect your long-term focus habits.</string>
+    <string name="recovery_option_challenge_title">150-Character Challenge</string>
+    <string name="recovery_option_challenge_desc">Retype a mindfulness manifesto manually (copy-paste is blocked). Limited to once every 7 days.</string>
+    <string name="recovery_challenge_available">Available now (1x per week)</string>
+    <string name="recovery_challenge_cooldown">Available in %1$s</string>
+    <string name="recovery_option_timelock_title">24-Hour Cooling Timer</string>
+    <string name="recovery_option_timelock_desc">Start a 24-hour waiting period to break dopamine craving. When done, you can set a new passphrase without retyping.</string>
+    <string name="recovery_timelock_active_badge">Running: %1$s left</string>
+    <string name="recovery_timelock_ready_badge">Ready to reset now!</string>
+    <string name="recovery_start_timelock_btn">Start 24h Timer</string>
+    <string name="recovery_cancel_timelock_btn">Cancel Reset</string>
+    <string name="recovery_challenge_dialog_title">Mindfulness Manifesto</string>
+    <string name="recovery_challenge_instructions">Type the exact text below manually. Copy-paste is disabled to ensure mindful friction.</string>
+    <string name="recovery_challenge_manifesto_text">I consciously choose to take control of my time and focus, rather than letting algorithms dictate my life. I am resetting this password with full awareness.</string>
+    <string name="recovery_challenge_paste_blocked">Pasting is disabled. Please type the text manually.</string>
+    <string name="recovery_challenge_progress">%1$d / %2$d characters</string>
+    <string name="recovery_challenge_completed_btn">Continue to New Passphrase</string>
+    <string name="recovery_set_new_title">Set New Passphrase</string>
+    <string name="recovery_set_new_subtitle">Enter a new emergency passphrase with a minimum of 35 characters.</string>
+    <string name="recovery_set_new_confirm_btn">Save New Passphrase</string>
+    <string name="recovery_banner_active_title">Passphrase Reset in Progress</string>
+    <string name="recovery_banner_active_desc">24h cooling timer active. Unlocks in %1$s.</string>
+    <string name="recovery_banner_ready_title">Passphrase Reset Ready</string>
+    <string name="recovery_banner_ready_desc">24h cooling period has finished. Tap to set your new passphrase.</string>
+    <string name="recovery_banner_reset_btn">Set New Passphrase</string>
+    <string name="recovery_success_toast">Emergency passphrase updated successfully</string>
 </resources>

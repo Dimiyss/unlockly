@@ -62,7 +62,7 @@
     <string name="time_to_study_desc">Öffne eine Lern-App, um Zeit für soziale Medien zu verdienen</string>
     <string name="focus_benefit_hint">Mehr Fokus — mehr Zeit für das, was du liebst</string>
     <string name="next_focus_session_title">Ziel der Fokus-Sitzung</string>
-    <string name="after_session_available">Nach der Sitzung verfügbar:</string>
+    <string name="after_session_available">Nach der Sitzung:</string>
     <string name="today_title">Heute</string>
     <string name="details_link">Details</string>
     <string name="used_today">heute verbraucht</string>
@@ -73,8 +73,8 @@
     <string name="initial_study_target_title">Erstes Lernziel</string>
     <string name="initial_study_target_desc">Mindestanforderung vor Freischaltung sozialer Apps</string>
     <string name="initial_study_target_met">Ziel erreicht • heute %1$s gelernt</string>
-    <string name="target_unlocked_badge">✅ Freigeschaltet</string>
-    <string name="target_locked_badge">🔒 Gesperrt</string>
+    <string name="target_unlocked_badge">🔓</string>
+    <string name="target_locked_badge">🔒</string>
     <string name="target_required">%1$s / %2$s Min. erforderlich</string>
     <string name="target_reward_allowance">Belohnung: +%1$s Min. Guthaben</string>
     <string name="target_reward_credited">+%1$s Min. Belohnung gutgeschrieben</string>
@@ -220,4 +220,34 @@
     <string name="onboarding_perm_battery_mandatory_notice">Das Deaktivieren der Akkuoptimierung ist erforderlich, damit Android den Hintergrunddienst nicht beendet.</string>
     <string name="onboarding_perm_battery_required_badge">Erforderlich</string>
     <string name="onboarding_perm_refresh">Berechtigungsstatus aktualisieren</string>
+
+    <!-- Emergency Passphrase Recovery -->
+    <string name="forgot_emergency_passphrase">Passphrase vergessen?</string>
+    <string name="emergency_recovery_title">Passphrase wiederherstellen</string>
+    <string name="emergency_recovery_subtitle">Wähle eine bewusste Wiederherstellungsmethode, um deine Fokusgewohnheiten zu schützen.</string>
+    <string name="recovery_option_challenge_title">150-Zeichen-Challenge</string>
+    <string name="recovery_option_challenge_desc">Tippe ein Achtsamkeitsmanifest manuell ab (Einfügen gesperrt). Einmal alle 7 Tage verfügbar.</string>
+    <string name="recovery_challenge_available">Jetzt verfügbar (1x pro Woche)</string>
+    <string name="recovery_challenge_cooldown">Verfügbar in %1$s</string>
+    <string name="recovery_option_timelock_title">24-Stunden-Abkühl-Timer</string>
+    <string name="recovery_option_timelock_desc">Starte eine 24-stündige Wartezeit. Danach kannst du ohne Tippen eine neue Passphrase festlegen.</string>
+    <string name="recovery_timelock_active_badge">Aktiv: noch %1$s</string>
+    <string name="recovery_timelock_ready_badge">Bereit zum Zurücksetzen!</string>
+    <string name="recovery_start_timelock_btn">24h-Timer starten</string>
+    <string name="recovery_cancel_timelock_btn">Zurücksetzen abbrechen</string>
+    <string name="recovery_challenge_dialog_title">Achtsamkeitsmanifest</string>
+    <string name="recovery_challenge_instructions">Tippe den folgenden Text manuell ein. Einfügen ist deaktiviert, um Achtsamkeit zu fördern.</string>
+    <string name="recovery_challenge_manifesto_text">Ich entscheide mich bewusst dafür, die Kontrolle über meine Zeit und meinen Fokus zu behalten. Ich setze diese Notfall-Passphrase mit voller Absicht zurück.</string>
+    <string name="recovery_challenge_paste_blocked">Einfügen ist deaktiviert. Bitte tippe manuell.</string>
+    <string name="recovery_challenge_progress">%1$d / %2$d Zeichen</string>
+    <string name="recovery_challenge_completed_btn">Weiter zur neuen Passphrase</string>
+    <string name="recovery_set_new_title">Neue Passphrase festlegen</string>
+    <string name="recovery_set_new_subtitle">Gib eine neue Notfall-Passphrase mit mindestens 35 Zeichen ein.</string>
+    <string name="recovery_set_new_confirm_btn">Neue Passphrase speichern</string>
+    <string name="recovery_banner_active_title">Passphrase-Zurücksetzung läuft</string>
+    <string name="recovery_banner_active_desc">24h-Timer aktiv. Freischaltung in %1$s.</string>
+    <string name="recovery_banner_ready_title">Zurücksetzung bereit</string>
+    <string name="recovery_banner_ready_desc">24 Stunden sind vergangen. Tippe hier, um eine neue Passphrase festzulegen.</string>
+    <string name="recovery_banner_reset_btn">Neue Passphrase festlegen</string>
+    <string name="recovery_success_toast">Notfall-Passphrase erfolgreich aktualisiert</string>
 </resources>

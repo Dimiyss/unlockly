@@ -74,6 +74,13 @@ fun HomeScreen(
     var passwordGateError by remember { mutableStateOf<String?>(null) }
     var showPreferencesDialog by remember { mutableStateOf(false) }
 
+    // Emergency Passphrase Recovery states
+    var showRecoveryOptionsDialog by remember { mutableStateOf(false) }
+    var showChallengeDialog by remember { mutableStateOf(false) }
+    var showSetNewPassphraseDialog by remember { mutableStateOf(false) }
+    var isCompletingTimeLockReset by remember { mutableStateOf(false) }
+    val recoveryState by app.emergencyRecoveryManager.recoveryState.collectAsState()
+
     val handleEditRulesRequest = {
         val stored = primaryRule?.emergencyPassword
         if (stored.isNullOrBlank()) {
@@ -194,6 +201,18 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Emergency TimeLock Reset Banner (if active or ready)
+            if (recoveryState.isTimeLockActive || recoveryState.isTimeLockReady) {
+                EmergencyTimeLockBanner(
+                    recoveryManager = app.emergencyRecoveryManager,
+                    onResetReadyClick = {
+                        isCompletingTimeLockReset = true
+                        showSetNewPassphraseDialog = true
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // Live Status Pill Banner
             LiveStatusBanner(
                 isAccruing = isAccruing,
@@ -372,6 +391,25 @@ fun HomeScreen(
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = {
+                                showPasswordGateDialog = false
+                                showRecoveryOptionsDialog = true
+                            }
+                        ) {
+                            Text(
+                                text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.forgot_emergency_passphrase),
+                                color = PrimaryIndigo,
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
+                    }
                 }
             },
             confirmButton = {
@@ -396,6 +434,57 @@ fun HomeScreen(
             dismissButton = {
                 TextButton(onClick = { showPasswordGateDialog = false }) {
                     Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        )
+    }
+
+    // Emergency Passphrase Recovery Dialogs
+    if (showRecoveryOptionsDialog) {
+        EmergencyResetOptionsDialog(
+            recoveryManager = app.emergencyRecoveryManager,
+            onDismissRequest = { showRecoveryOptionsDialog = false },
+            onStartChallenge = {
+                showChallengeDialog = true
+            },
+            onStartNewPasswordForTimeLock = {
+                isCompletingTimeLockReset = true
+                showSetNewPassphraseDialog = true
+            }
+        )
+    }
+
+    if (showChallengeDialog) {
+        TypingChallengeDialog(
+            onDismissRequest = { showChallengeDialog = false },
+            onChallengeCompleted = {
+                showChallengeDialog = false
+                isCompletingTimeLockReset = false
+                showSetNewPassphraseDialog = true
+            }
+        )
+    }
+
+    if (showSetNewPassphraseDialog) {
+        SetNewPassphraseDialog(
+            onDismissRequest = { showSetNewPassphraseDialog = false },
+            onPassphraseConfirmed = { newPassphrase ->
+                scope.launch {
+                    val success = if (isCompletingTimeLockReset) {
+                        app.emergencyRecoveryManager.completeTimeLockReset(newPassphrase)
+                    } else {
+                        app.emergencyRecoveryManager.completeChallengeReset(newPassphrase)
+                    }
+
+                    if (success) {
+                        showSetNewPassphraseDialog = false
+                        Toast.makeText(
+                            context,
+                            context.getString(com.arhiplabs.unstuckly.R.string.recovery_success_toast),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onNavigateToRuleEditor()
+                    }
                 }
             }
         )
@@ -1049,11 +1138,14 @@ fun InitialStudyTargetCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.weight(1f, fill = false),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         imageVector = Icons.Default.Schedule,
                         contentDescription = null,
-                        tint = if (isCompleted) SuccessGreen else SuccessGreen,
+                        tint = SuccessGreen,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -1066,9 +1158,11 @@ fun InitialStudyTargetCard(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
                     text = if (isCompleted) androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_unlocked_badge) else androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.target_locked_badge),
-                    style = MaterialTheme.typography.labelSmall.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = if (isCompleted) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
