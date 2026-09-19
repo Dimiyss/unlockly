@@ -89,6 +89,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.play.billing)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
