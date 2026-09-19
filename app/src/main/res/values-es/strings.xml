@@ -250,4 +250,12 @@
     <string name="recovery_banner_ready_desc">Han pasado 24 horas. Pulsa para establecer tu nueva frase.</string>
     <string name="recovery_banner_reset_btn">Establecer nueva frase</string>
     <string name="recovery_success_toast">Frase de emergencia actualizada correctamente</string>
+
+    <!-- Settings Password Gate -->
+    <string name="password_gate_title">Contraseña requerida</string>
+    <string name="password_gate_desc">Introduce tu contraseña de emergencia para acceder y modificar las reglas:</string>
+    <string name="password_gate_placeholder">Introduce la frase…</string>
+    <string name="password_gate_unlock_btn">Desbloquear ajustes</string>
+    <string name="password_gate_incorrect">Contraseña incorrecta. Acceso denegado.</string>
+    <string name="cancel">Cancelar</string>
 </resources>

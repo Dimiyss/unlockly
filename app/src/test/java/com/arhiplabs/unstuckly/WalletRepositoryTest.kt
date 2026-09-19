@@ -3,6 +3,7 @@ package com.arhiplabs.unstuckly
 import com.arhiplabs.unstuckly.data.model.Wallet
 import com.arhiplabs.unstuckly.data.repository.WalletRepository
 import com.arhiplabs.unstuckly.fakes.FakeWalletDao
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -69,6 +70,29 @@ class WalletRepositoryTest {
         assertEquals(0L, retrieved.spentTodaySeconds)
         assertEquals(0L, retrieved.productiveStudySecondsToday)
         assertFalse(retrieved.emergencyUnlockUsedToday)
+    }
+
+    @Test
+    fun testWalletFlow_autoResetsWhenDayChanges() = runBlocking {
+        val yesterdayCal = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -1)
+        }
+        val oldWallet = Wallet(
+            availableSeconds = 600L,
+            earnedTodaySeconds = 1200L,
+            spentTodaySeconds = 600L,
+            productiveStudySecondsToday = 1800L,
+            emergencyUnlockUsedToday = true,
+            lastResetAt = yesterdayCal.timeInMillis
+        )
+        fakeDao.insertOrUpdateWallet(oldWallet)
+
+        val flowEmission = repository.walletFlow.first()
+        assertEquals(0L, flowEmission?.availableSeconds)
+        assertEquals(0L, flowEmission?.earnedTodaySeconds)
+        assertEquals(0L, flowEmission?.spentTodaySeconds)
+        assertEquals(0L, flowEmission?.productiveStudySecondsToday)
+        assertFalse(flowEmission?.emergencyUnlockUsedToday ?: true)
     }
 
     @Test

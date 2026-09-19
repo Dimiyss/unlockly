@@ -3,10 +3,26 @@ package com.arhiplabs.unstuckly.data.repository
 import com.arhiplabs.unstuckly.data.db.WalletDao
 import com.arhiplabs.unstuckly.data.model.Wallet
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.Calendar
 
 class WalletRepository(private val walletDao: WalletDao) {
-    val walletFlow: Flow<Wallet?> = walletDao.getWalletFlow()
+    val walletFlow: Flow<Wallet?> = walletDao.getWalletFlow().map { current ->
+        if (current != null && isDifferentDay(current.lastResetAt, System.currentTimeMillis())) {
+            val resetWallet = current.copy(
+                availableSeconds = 0L,
+                earnedTodaySeconds = 0L,
+                spentTodaySeconds = 0L,
+                productiveStudySecondsToday = 0L,
+                emergencyUnlockUsedToday = false,
+                lastResetAt = System.currentTimeMillis()
+            )
+            walletDao.insertOrUpdateWallet(resetWallet)
+            resetWallet
+        } else {
+            current
+        }
+    }
 
     suspend fun getWallet(): Wallet {
         val current = walletDao.getWallet()

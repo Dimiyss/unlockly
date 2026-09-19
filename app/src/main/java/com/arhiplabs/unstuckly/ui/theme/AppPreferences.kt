@@ -1,5 +1,6 @@
 package com.arhiplabs.unstuckly.ui.theme
 
+import android.app.LocaleManager
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -35,6 +36,7 @@ enum class AppLanguage(val code: String, val displayName: String, val flag: Stri
 
 class AppPreferences(private val context: Context) {
     private val prefs = context.getSharedPreferences("unstuckly_prefs", Context.MODE_PRIVATE)
+    private val systemDefaultLocale: Locale = Locale.getDefault()
 
     private val _themeMode = MutableStateFlow(
         AppThemeMode.valueOf(prefs.getString("theme_mode", AppThemeMode.SYSTEM.name) ?: AppThemeMode.SYSTEM.name)
@@ -54,15 +56,32 @@ class AppPreferences(private val context: Context) {
     fun setLanguage(lang: AppLanguage) {
         prefs.edit().putString("app_language", lang.code).apply()
         _language.value = lang
+
+        val targetLocale = if (lang == AppLanguage.SYSTEM) systemDefaultLocale else Locale.forLanguageTag(lang.code)
+        Locale.setDefault(targetLocale)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            try {
+                val localeManager = context.getSystemService(LocaleManager::class.java)
+                val localeList = if (lang == AppLanguage.SYSTEM) {
+                    LocaleList.getEmptyLocaleList()
+                } else {
+                    LocaleList.forLanguageTags(lang.code)
+                }
+                localeManager?.applicationLocales = localeList
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun getLocalizedContext(baseContext: Context): Context {
         val currentLang = _language.value
-        if (currentLang == AppLanguage.SYSTEM) {
-            return baseContext
+        val locale = if (currentLang == AppLanguage.SYSTEM) {
+            systemDefaultLocale
+        } else {
+            Locale.forLanguageTag(currentLang.code)
         }
-
-        val locale = Locale(currentLang.code)
         Locale.setDefault(locale)
 
         val config = Configuration(baseContext.resources.configuration)
@@ -72,6 +91,7 @@ class AppPreferences(private val context: Context) {
             @Suppress("DEPRECATION")
             config.locale = locale
         }
+        config.setLayoutDirection(locale)
 
         return baseContext.createConfigurationContext(config)
     }

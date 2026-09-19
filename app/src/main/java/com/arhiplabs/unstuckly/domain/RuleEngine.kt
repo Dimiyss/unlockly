@@ -97,4 +97,33 @@ object RuleEngine {
         val dailyCapSeconds = dailyCapMinutes * 60L
         return earnedTodaySeconds >= dailyCapSeconds
     }
+
+    /**
+     * Checks if the initial daily productive study target is fulfilled.
+     */
+    fun isInitialStudyTargetMet(productiveStudySecondsToday: Long, productiveMinutesTarget: Int): Boolean {
+        if (productiveMinutesTarget <= 0) return true
+        val targetSeconds = productiveMinutesTarget * 60L
+        return productiveStudySecondsToday >= targetSeconds
+    }
+
+    /**
+     * Determines whether a blocked app should be blocked based on wallet state and rule parameters.
+     * At the beginning of the day, social apps are strictly blocked until the initial study target is met,
+     * unless emergency unlock was used today or unfreeze mode is active.
+     */
+    fun shouldBlockApp(
+        productiveStudySecondsToday: Long,
+        productiveMinutesTarget: Int,
+        availableSeconds: Long,
+        emergencyUnlockUsedToday: Boolean,
+        isUnfrozen: Boolean
+    ): Boolean {
+        if (isUnfrozen) return false
+        if (emergencyUnlockUsedToday && availableSeconds > 0) return false
+        val initialTargetMet = isInitialStudyTargetMet(productiveStudySecondsToday, productiveMinutesTarget)
+        if (!initialTargetMet) return true
+        return availableSeconds <= 0
+    }
 }
+

@@ -189,6 +189,105 @@ class RuleEngineTest {
     }
 
     @Test
+    fun testIsInitialStudyTargetMet() {
+        // At start of day (0s study): target is not met
+        assertFalse(RuleEngine.isInitialStudyTargetMet(productiveStudySecondsToday = 0L, productiveMinutesTarget = 30))
+        assertFalse(RuleEngine.isInitialStudyTargetMet(productiveStudySecondsToday = 600L, productiveMinutesTarget = 30))
+        assertFalse(RuleEngine.isInitialStudyTargetMet(productiveStudySecondsToday = 1799L, productiveMinutesTarget = 30))
+
+        // Exactly at milestone threshold (1800s = 30m)
+        assertTrue(RuleEngine.isInitialStudyTargetMet(productiveStudySecondsToday = 1800L, productiveMinutesTarget = 30))
+
+        // Beyond initial threshold
+        assertTrue(RuleEngine.isInitialStudyTargetMet(productiveStudySecondsToday = 2400L, productiveMinutesTarget = 30))
+
+        // No target configured
+        assertTrue(RuleEngine.isInitialStudyTargetMet(productiveStudySecondsToday = 0L, productiveMinutesTarget = 0))
+    }
+
+    @Test
+    fun testShouldBlockApp_initialLimitAtStartOfDay() {
+        val targetMinutes = 30
+
+        // 1. Beginning of day: 0 study time, 0 wallet -> MUST BE BLOCKED
+        assertTrue(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 0L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 0L,
+                emergencyUnlockUsedToday = false,
+                isUnfrozen = false
+            )
+        )
+
+        // 2. Partial progress (e.g. 15 minutes in study app): target NOT met -> MUST BE BLOCKED
+        assertTrue(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 900L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 0L,
+                emergencyUnlockUsedToday = false,
+                isUnfrozen = false
+            )
+        )
+
+        // 3. Glitch/leftover balance before initial target is met: STILL BLOCKED (mandatory daily start requirement)
+        assertTrue(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 900L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 300L,
+                emergencyUnlockUsedToday = false,
+                isUnfrozen = false
+            )
+        )
+
+        // 4. Initial target completed (1800s) + reward available (1200s) -> UNLOCKED (allowed to use social apps)
+        assertFalse(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 1800L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 1200L,
+                emergencyUnlockUsedToday = false,
+                isUnfrozen = false
+            )
+        )
+
+        // 5. Initial target completed, but wallet time fully consumed (0s available) -> BLOCKED
+        assertTrue(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 1800L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 0L,
+                emergencyUnlockUsedToday = false,
+                isUnfrozen = false
+            )
+        )
+
+        // 6. Emergency unlock used today overrides initial limit & grants access
+        assertFalse(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 0L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 900L,
+                emergencyUnlockUsedToday = true,
+                isUnfrozen = false
+            )
+        )
+
+        // 7. Pro unfreeze mode active overrides all blocking
+        assertFalse(
+            RuleEngine.shouldBlockApp(
+                productiveStudySecondsToday = 0L,
+                productiveMinutesTarget = targetMinutes,
+                availableSeconds = 0L,
+                emergencyUnlockUsedToday = false,
+                isUnfrozen = true
+            )
+        )
+    }
+
+    @Test
     fun testPipBlockedPackageResolution() {
         val blockedPackages = setOf("com.google.android.youtube", "com.zhiliaoapp.musically", "com.instagram.android")
         val youtubePip = "com.google.android.youtube"
