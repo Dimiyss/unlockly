@@ -250,4 +250,12 @@
     <string name="recovery_banner_ready_desc">24 часа прошло. Нажмите, чтобы установить новый пароль.</string>
     <string name="recovery_banner_reset_btn">Установить новый пароль</string>
     <string name="recovery_success_toast">Экстренный пароль успешно обновлен</string>
+
+    <!-- Settings Password Gate -->
+    <string name="password_gate_title">Требуется пароль</string>
+    <string name="password_gate_desc">Введите экстренный пароль для доступа и изменения настроек / правил:</string>
+    <string name="password_gate_placeholder">Введите фразу…</string>
+    <string name="password_gate_unlock_btn">Разблокировать настройки</string>
+    <string name="password_gate_incorrect">Неверный пароль. Доступ запрещен.</string>
+    <string name="cancel">Отмена</string>
 </resources>

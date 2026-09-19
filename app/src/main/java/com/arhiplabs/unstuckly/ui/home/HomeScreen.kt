@@ -48,9 +48,10 @@ fun HomeScreen(
     val app = UnstucklyApplication.instance
     val scope = rememberCoroutineScope()
 
-    // Start background tracking service if not already started
+    // Start background tracking service if not already started & ensure daily reset
     LaunchedEffect(Unit) {
         AppTrackingForegroundService.startService(context)
+        app.walletManager.getWallet()
     }
 
     val walletState by app.walletManager.walletFlow.collectAsState(initial = Wallet())
@@ -343,13 +344,17 @@ fun HomeScreen(
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Password Required", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.password_gate_title),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             text = {
                 Column {
                     Text(
-                        text = "Enter your emergency password to access and modify app settings / rules:",
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.password_gate_desc),
                         style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                     Spacer(modifier = Modifier.height(14.dp))
@@ -360,7 +365,12 @@ fun HomeScreen(
                             passwordGateInput = it
                             passwordGateError = null
                         },
-                        placeholder = { Text("Enter passphrase...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
+                        placeholder = {
+                            Text(
+                                text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.password_gate_placeholder),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        },
                         visualTransformation = if (passwordGateVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { passwordGateVisible = !passwordGateVisible }) {
@@ -423,17 +433,24 @@ fun HomeScreen(
                             passwordGateError = null
                             onNavigateToRuleEditor()
                         } else {
-                            passwordGateError = "Incorrect password. Access denied."
+                            passwordGateError = context.getString(com.arhiplabs.unstuckly.R.string.password_gate_incorrect)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
                 ) {
-                    Text("Unlock Settings", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.password_gate_unlock_btn),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPasswordGateDialog = false }) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = androidx.compose.ui.res.stringResource(com.arhiplabs.unstuckly.R.string.cancel),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         )

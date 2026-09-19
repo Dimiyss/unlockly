@@ -43,21 +43,35 @@ class EarnSessionManager(
             _activeProductivePackage.value = currentPackage
 
             // 1. Record productive study time
+            val prevStudySeconds = wallet.productiveStudySecondsToday
+            val newStudySeconds = prevStudySeconds + 1L
             walletManager.addProductiveStudySeconds(1L)
 
-            // 2. Accrue rewards incrementally from second 1 based on configured ratio & boost multiplier
-            val rewardRatePerSecond = if (rule.productiveMinutesTarget > 0) {
-                (rule.rewardMinutes.toDouble() / rule.productiveMinutesTarget.toDouble()) * wallet.effectiveBoostMultiplier
-            } else {
-                1.0 * wallet.effectiveBoostMultiplier
-            }
-            pendingSeconds += rewardRatePerSecond
+            val targetSeconds = rule.productiveMinutesTarget * 60L
+            val rewardPerTargetSeconds = (rule.rewardMinutes * 60L * wallet.effectiveBoostMultiplier).toLong()
 
-            if (pendingSeconds >= 0.999999) {
-                val addSec = Math.round(pendingSeconds).toLong()
-                pendingSeconds = (pendingSeconds - addSec.toDouble()).coerceAtLeast(0.0)
-                if (addSec > 0) {
-                    walletManager.addRewardSeconds(addSec)
+            // 2. Initial minimum interval milestone
+            if (prevStudySeconds < targetSeconds) {
+                // User is working toward their first minimum study requirement of the day
+                if (newStudySeconds >= targetSeconds) {
+                    // Milestone achieved! Deposit first full interval reward
+                    walletManager.addRewardSeconds(rewardPerTargetSeconds)
+                }
+            } else {
+                // Initial daily target was already fulfilled. Accrue subsequent rewards incrementally
+                val rewardRatePerSecond = if (rule.productiveMinutesTarget > 0) {
+                    (rule.rewardMinutes.toDouble() / rule.productiveMinutesTarget.toDouble()) * wallet.effectiveBoostMultiplier
+                } else {
+                    1.0 * wallet.effectiveBoostMultiplier
+                }
+                pendingSeconds += rewardRatePerSecond
+
+                if (pendingSeconds >= 0.999999) {
+                    val addSec = Math.round(pendingSeconds).toLong()
+                    pendingSeconds = (pendingSeconds - addSec.toDouble()).coerceAtLeast(0.0)
+                    if (addSec > 0) {
+                        walletManager.addRewardSeconds(addSec)
+                    }
                 }
             }
         } else {

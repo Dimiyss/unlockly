@@ -53,17 +53,19 @@ class BlockingCoordinator(
         _isBlockedAppActive.value = true
         val wallet = walletManager.getWallet()
 
-        if (wallet.isUnfrozen) {
-            // Unfreeze active: bypass all blocking rules
-            overlayManager.hideOverlay()
-            return@withContext
-        }
+        val shouldBlock = RuleEngine.shouldBlockApp(
+            productiveStudySecondsToday = wallet.productiveStudySecondsToday,
+            productiveMinutesTarget = rule.productiveMinutesTarget,
+            availableSeconds = wallet.availableSeconds,
+            emergencyUnlockUsedToday = wallet.emergencyUnlockUsedToday,
+            isUnfrozen = wallet.isUnfrozen
+        )
 
-        if (wallet.availableSeconds > 0) {
+        if (!shouldBlock) {
             overlayManager.hideOverlay()
             walletManager.deductSpentSeconds(1)
         } else {
-            // Wallet is empty! Trigger blocking
+            // Initial target not met or wallet empty: trigger blocking
             val overlaySuccess = if (Settings.canDrawOverlays(context)) {
                 overlayManager.showOverlay(packageName)
             } else {
@@ -86,15 +88,19 @@ class BlockingCoordinator(
         _isBlockedAppActive.value = true
         val wallet = walletManager.getWallet()
 
-        if (wallet.isUnfrozen) {
-            return@withContext
-        }
+        val shouldBlockPip = RuleEngine.shouldBlockApp(
+            productiveStudySecondsToday = wallet.productiveStudySecondsToday,
+            productiveMinutesTarget = rule.productiveMinutesTarget,
+            availableSeconds = wallet.availableSeconds,
+            emergencyUnlockUsedToday = wallet.emergencyUnlockUsedToday,
+            isUnfrozen = wallet.isUnfrozen
+        )
 
-        if (wallet.availableSeconds > 0) {
+        if (!shouldBlockPip) {
             // Deduct spent seconds while user watches video in PiP
             walletManager.deductSpentSeconds(1)
         } else {
-            // Wallet is empty/target not met: neutralize PiP floating window
+            // Initial target not met or wallet empty: neutralize PiP floating window
             neutralizePip(packageName)
         }
     }

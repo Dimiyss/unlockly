@@ -250,4 +250,12 @@
     <string name="recovery_banner_ready_desc">24 години минули. Натисніть, щоб встановити новий емерженсі пароль.</string>
     <string name="recovery_banner_reset_btn">Встановити новий пароль</string>
     <string name="recovery_success_toast">Екстрений пароль успішно оновлено</string>
+
+    <!-- Settings Password Gate -->
+    <string name="password_gate_title">Потрібен пароль</string>
+    <string name="password_gate_desc">Введіть екстрений пароль для доступу та зміни налаштувань / правил:</string>
+    <string name="password_gate_placeholder">Введіть фразу…</string>
+    <string name="password_gate_unlock_btn">Розблокувати налаштування</string>
+    <string name="password_gate_incorrect">Невірний пароль. Доступ заборонено.</string>
+    <string name="cancel">Скасувати</string>
 </resources>

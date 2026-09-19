@@ -106,29 +106,32 @@ class BlockingOverlayManager(private val context: Context) {
                 }
 
                 CompositionLocalProvider(
-                    LocalContext provides localizedContext
+                    LocalContext provides localizedContext,
+                    androidx.compose.ui.platform.LocalConfiguration provides localizedContext.resources.configuration
                 ) {
-                    UnstucklyTheme(preferences = preferences) {
-                        OverlayContent(
-                            blockedPackage = blockedPackage,
-                            onOpenUnlockly = {
-                                hideOverlay()
-                                val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-                                if (launchIntent != null) {
-                                    launchIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                    context.startActivity(launchIntent)
+                    key(language) {
+                        UnstucklyTheme(preferences = preferences) {
+                            OverlayContent(
+                                blockedPackage = blockedPackage,
+                                onOpenUnlockly = {
+                                    hideOverlay()
+                                    val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                                    if (launchIntent != null) {
+                                        launchIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                        context.startActivity(launchIntent)
+                                    }
+                                },
+                                onEmergencyUnlocked = {
+                                    hideOverlay()
+                                    val toastMsg: CharSequence = localizedContext.getString(R.string.blocker_emergency_granted_toast)
+                                    Toast.makeText(
+                                        localizedContext,
+                                        toastMsg,
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
-                            },
-                            onEmergencyUnlocked = {
-                                hideOverlay()
-                                val toastMsg: CharSequence = localizedContext.getString(R.string.blocker_emergency_granted_toast)
-                                Toast.makeText(
-                                    localizedContext,
-                                    toastMsg,
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

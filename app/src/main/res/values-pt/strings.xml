@@ -250,4 +250,12 @@
     <string name="recovery_banner_ready_desc">24 horas se passaram. Toque para definir sua nova frase.</string>
     <string name="recovery_banner_reset_btn">Definir Nova Frase</string>
     <string name="recovery_success_toast">Frase de emergência atualizada com sucesso</string>
+
+    <!-- Settings Password Gate -->
+    <string name="password_gate_title">Senha necessária</string>
+    <string name="password_gate_desc">Digite sua senha de emergência para acessar e modificar as regras:</string>
+    <string name="password_gate_placeholder">Digite a frase…</string>
+    <string name="password_gate_unlock_btn">Desbloquear configurações</string>
+    <string name="password_gate_incorrect">Senha incorreta. Acesso negado.</string>
+    <string name="cancel">Cancelar</string>
 </resources>

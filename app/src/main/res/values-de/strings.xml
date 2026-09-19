@@ -250,4 +250,12 @@
     <string name="recovery_banner_ready_desc">24 Stunden sind vergangen. Tippe hier, um eine neue Passphrase festzulegen.</string>
     <string name="recovery_banner_reset_btn">Neue Passphrase festlegen</string>
     <string name="recovery_success_toast">Notfall-Passphrase erfolgreich aktualisiert</string>
+
+    <!-- Settings Password Gate -->
+    <string name="password_gate_title">Passwort erforderlich</string>
+    <string name="password_gate_desc">Geben Sie Ihr Notfallpasswort ein, um Einstellungen / Regeln zu bearbeiten:</string>
+    <string name="password_gate_placeholder">Passphrase eingeben…</string>
+    <string name="password_gate_unlock_btn">Einstellungen freischalten</string>
+    <string name="password_gate_incorrect">Falsches Passwort. Zugriff verweigert.</string>
+    <string name="cancel">Abbrechen</string>
 </resources>

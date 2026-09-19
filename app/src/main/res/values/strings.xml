@@ -250,4 +250,12 @@
     <string name="recovery_banner_ready_desc">24h cooling period has finished. Tap to set your new passphrase.</string>
     <string name="recovery_banner_reset_btn">Set New Passphrase</string>
     <string name="recovery_success_toast">Emergency passphrase updated successfully</string>
+
+    <!-- Settings Password Gate -->
+    <string name="password_gate_title">Password Required</string>
+    <string name="password_gate_desc">Enter your emergency password to access and modify app settings / rules:</string>
+    <string name="password_gate_placeholder">Enter passphrase…</string>
+    <string name="password_gate_unlock_btn">Unlock Settings</string>
+    <string name="password_gate_incorrect">Incorrect password. Access denied.</string>
+    <string name="cancel">Cancel</string>
 </resources>
